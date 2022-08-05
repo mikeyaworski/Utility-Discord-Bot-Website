@@ -1,0 +1,99 @@
+parser: '@typescript-eslint/parser'
+env:
+  browser: true
+  es6: true
+  node: true
+  webextensions: true
+settings:
+  import/resolver:
+    node:
+      moduleDirectory:
+      - node_modules
+      - src
+      extensions:
+        - '.js'
+        - '.jsx'
+        - '.ts'
+        - '.tsx'
+extends:
+  - airbnb
+  - 'plugin:@typescript-eslint/recommended'
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 2018
+  sourceType: module
+plugins:
+  - react
+  - react-hooks
+  - '@typescript-eslint'
+# Disable TS linting for JS files and then override it for TS files
+# https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/explicit-module-boundary-types.md#configuring-in-a-mixed-jsts-codebase
+overrides:
+  - files: ['*.ts', '*.tsx']
+    rules:
+      '@typescript-eslint/explicit-module-boundary-types': error
+rules:
+  # Rules which will be overriden (see overrides)
+  '@typescript-eslint/explicit-module-boundary-types': off
+  
+  # Redundant TS rules which can just be disabled
+  '@typescript-eslint/no-unused-vars': off
+
+  # TS rules
+  '@typescript-eslint/ban-ts-comment': off # We obviously need to use this in certain cases
+  '@typescript-eslint/no-non-null-assertion': off # Obviously if we're specifying this, we know this assertion to be true
+
+  # https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md#how-to-use
+  no-use-before-define: off
+  '@typescript-eslint/no-use-before-define':
+    - error
+
+  no-shadow: off # This rule is broken with TS
+  react/prop-types: off # Was using InferProps to get TS type from this, but this made non-required types null, which conflicts with MUI. Not worth the headache.
+  linebreak-style: off # Convenience for Windows
+  import/prefer-default-export: off # This is stupid to be made a general rule. Should be case by case.
+  max-len: # 100 is too little and often leads to uglier formatting
+    - error
+    - code: 150
+      tabWidth: 2
+  arrow-parens: # No parenthesis are cleaner
+    - error
+    - as-needed
+  no-param-reassign: off # There are lots of valid use cases for this. Having it off leads to messy code with weird variables names.
+  no-plusplus: # Obviously better for loops lol
+    - error
+    - allowForLoopAfterthoughts: true
+  object-curly-newline: # Define this rule ourselves since we don't want minProperties: 3 (this should be determined by line length)
+    - error
+    - multiline: true
+      consistent: true
+  import/extensions:
+    - error
+    - js: never
+      jsx: never
+      ts: never
+      tsx: never
+  react/jsx-filename-extension:
+    - error
+    - extensions:
+      - '.tsx'
+  react-hooks/rules-of-hooks:
+    - error
+  react-hooks/exhaustive-deps:
+    - error
+  react/jsx-one-expression-per-line: # Leads to really unclean code
+    - off
+  react/jsx-props-no-spreading: off # TypeScript makes this acceptable in many use cases
+  arrow-body-style: off # This often leads to difficult-to-read inline functions
+  no-await-in-loop: off # This is often required for pagination
+  no-inner-declarations: off # No reason for this if we can do fat arrow functions anyway
+  react/require-default-props: off # Case-by-case basis
+  jsx-a11y/anchor-is-valid: off # This rule is broken
+  react/function-component-definition: off # This sucks with TS
+
+  # We are not worried about accessibility
+  jsx-a11y/media-has-caption: off
+  jsx-a11y/click-events-have-key-events: off
+  jsx-a11y/role-has-required-aria-props: off
+  jsx-a11y/no-static-element-interactions: off

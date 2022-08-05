@@ -1,26 +1,98 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import Button from '@mui/material/Button';
+import { error } from 'logging';
 
-function App() {
+const Home: React.FC = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    async function checkLoggedIn() {
+      try {
+        await fetch(`${process.env.REACT_APP_API_ROOT}/auth/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        }).then(response => response.json());
+        setLoggedIn(true);
+      } catch {
+        // Intentionally empty - they're not logged in
+      }
+    }
+    checkLoggedIn();
+    if (window.location.hash) {
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const token = params.get('access_token');
+      const tokenType = params.get('token_type');
+      const expiresIn = params.get('expires_in');
+      const scope = params.get('scope');
+      const data = {
+        token,
+        tokenType,
+        expiresIn,
+        scope,
+      };
+      async function logIn() {
+        try {
+          await fetch(`${process.env.REACT_APP_API_ROOT}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            credentials: 'include',
+          });
+          window.history.replaceState(null, '', '#');
+          await checkLoggedIn();
+        } catch (err) {
+          error('Error:', err);
+        }
+      }
+      if (token) {
+        logIn();
+      }
+    }
+  }, []);
+
+  async function handleLogOut() {
+    try {
+      await fetch(`${process.env.REACT_APP_API_ROOT}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      await setLoggedIn(false);
+    } catch (err) {
+      error('Error:', err);
+    }
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="main-page">
+      {loggedIn ? (
+        <Button
+          onClick={() => handleLogOut()}
+          variant="contained"
         >
-          Learn React
-        </a>
-      </header>
+          Log Out
+        </Button>
+      ) : (
+        <Button
+          href={`https://discord.com/api/oauth2/authorize?client_id=${
+            process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
+          }&redirect_uri=${
+            encodeURIComponent(process.env.REACT_APP_REDIRECT_URI!)
+          }&response_type=token&scope=identify%20guilds`}
+          variant="contained"
+        >
+          Log In
+        </Button>
+      )}
     </div>
   );
-}
+};
 
-export default App;
+export default Home;
