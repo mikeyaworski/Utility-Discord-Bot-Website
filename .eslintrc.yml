@@ -91,6 +91,7 @@ rules:
   react/require-default-props: off # Case-by-case basis
   jsx-a11y/anchor-is-valid: off # This rule is broken
   react/function-component-definition: off # This sucks with TS
+  no-nested-ternary: off # This is actually clean
 
   # We are not worried about accessibility
   jsx-a11y/media-has-caption: off
