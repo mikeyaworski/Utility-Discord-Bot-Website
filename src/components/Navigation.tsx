@@ -205,7 +205,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
       </Drawer>
       <Main open={sidebarOpen}>
         <DrawerHeader />
-        <Box sx={{ padding: 10 }}>
+        <Box sx={{ padding: 5 }}>
           {children}
         </Box>
       </Main>
