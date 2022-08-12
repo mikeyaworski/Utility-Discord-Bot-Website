@@ -43,6 +43,7 @@ rules:
   # TS rules
   '@typescript-eslint/ban-ts-comment': off # We obviously need to use this in certain cases
   '@typescript-eslint/no-non-null-assertion': off # Obviously if we're specifying this, we know this assertion to be true
+  '@typescript-eslint/no-empty-function': off
 
   # https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/no-use-before-define.md#how-to-use
   no-use-before-define: off

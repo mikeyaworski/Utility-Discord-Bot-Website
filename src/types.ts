@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalAny = any;
 
@@ -18,15 +20,38 @@ export interface User {
 }
 
 export interface Reminder {
-  id: string,
-  guild_id: string | null,
-  channel_id: string,
-  owner_id: string,
-  time: number,
-  end_time: number | null,
-  max_occurrences: number | null,
-  interval: number | null,
-  message: string | null,
-  createdAt: string,
-  updatedAt: string,
+  model: {
+    id: string,
+    guild_id: string | null,
+    channel_id: string,
+    owner_id: string,
+    time: number,
+    end_time: number | null,
+    max_occurrences: number | null,
+    interval: number | null,
+    message: string | null,
+    createdAt: string,
+    updatedAt: string,
+  },
+  nextRun: number | null | undefined,
 }
+
+export enum ChannelType {
+  VOICE,
+  DM,
+  TEXT,
+  THREAD,
+  OTHER,
+}
+
+export interface Channel {
+  id: string,
+  name: string,
+  type: ChannelType,
+  parent: {
+    id: string,
+    name: string,
+  } | null,
+}
+
+export type SetState<T> = Dispatch<SetStateAction<T>>;

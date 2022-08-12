@@ -7,15 +7,19 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 import { AuthContext } from 'contexts/auth';
+import { GuildContext } from 'contexts/guild';
 import { fetchApi } from 'utils';
 import { error } from 'logging';
 import { Reminder } from 'types';
-import ReminderCard, { ReminderCardSkeleton } from './Reminder';
+import ReminderCard from './Reminder';
+import ReminderCardSkeleton from './ReminderSkeleton';
 
 const Reminders: React.FC = () => {
   const { user } = useContext(AuthContext);
+  const { selectedGuildId } = useContext(GuildContext);
   const [loading, setLoading] = useState(true);
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -29,12 +33,18 @@ const Reminders: React.FC = () => {
     });
   }, [user]);
 
-  const updateReminder = useCallback((reminder: Reminder) => {
-    setReminders(old => old.map(oldReminder => (oldReminder.id === reminder.id ? reminder : oldReminder)));
+  const onReminderUpdated = useCallback((reminder: Reminder) => {
+    setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? reminder : oldReminder)));
+    // Refetch the reminder since there is some data that needs to be retrieved from the server, like nextRun
+    fetchApi<Reminder>({
+      path: `/reminders/${reminder.model.id}`,
+    }).then(updatedReminder => {
+      setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? updatedReminder : oldReminder)));
+    });
   }, []);
 
-  const deleteReminder = useCallback((id: string) => {
-    setReminders(old => old.filter(reminder => reminder.id !== id));
+  const onReminderDeleted = useCallback((id: string) => {
+    setReminders(old => old.filter(reminder => reminder.model.id !== id));
   }, []);
 
   if (loading) {
@@ -48,19 +58,25 @@ const Reminders: React.FC = () => {
     );
   }
 
+  const filteredReminders = reminders.filter(r => r.model.guild_id === selectedGuildId);
+
   return (
     <>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        {reminders.map(reminder => (
+        {filteredReminders.map(reminder => (
           <ReminderCard
-            key={reminder.id}
+            key={reminder.model.id}
             reminder={reminder}
-            updateReminder={updateReminder}
-            deleteReminder={() => deleteReminder(reminder.id)}
+            onReminderUpdated={onReminderUpdated}
+            onReminderDeleted={() => onReminderDeleted(reminder.model.id)}
           />
         ))}
       </Box>
-      <Fab color="primary" sx={{ position: 'absolute', right: 40, bottom: 40 }}>
+      <Fab
+        color="primary"
+        sx={{ position: 'absolute', right: 40, bottom: 40 }}
+        onClick={() => setCreateModalOpen(true)}
+      >
         <AddIcon />
       </Fab>
     </>
