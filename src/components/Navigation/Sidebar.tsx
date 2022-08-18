@@ -69,9 +69,10 @@ const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
           boxSizing: 'border-box',
         },
       }}
-      variant="persistent"
+      variant="temporary"
       anchor="left"
       open={sidebarOpen}
+      onClose={() => setSidebarOpen(false)}
     >
       <DrawerHeader>
         <IconButton onClick={() => setSidebarOpen(false)}>

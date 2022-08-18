@@ -1,30 +1,26 @@
-/**
- * Lots of code copied from
- * https://mui.com/material-ui/react-drawer/#persistent-drawer
- */
-
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Box,
   styled,
+  useTheme,
 } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
+import { useIsMobile } from 'hooks';
 import Sidebar, { sidebarWidth, DrawerHeader } from './Sidebar';
 import Topbar from './Topbar';
 
-const Main = styled('main', { shouldForwardProp: prop => prop !== 'open' })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
+const Main = styled('main', { shouldForwardProp: prop => prop !== 'shrunk' })<{
+  shrunk?: boolean;
+}>(({ theme, shrunk }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${sidebarWidth}px`,
-  ...(open && {
+  // marginLeft: `-${sidebarWidth}px`,
+  ...(shrunk && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -39,7 +35,8 @@ interface Props {
 
 const Navigation: React.FC<Props> = ({ children }) => {
   const { refetchUser } = useContext(AuthContext);
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const theme = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (window.location.hash) {
@@ -75,14 +72,23 @@ const Navigation: React.FC<Props> = ({ children }) => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <Topbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Topbar setSidebarOpen={setSidebarOpen} />
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <Main open={sidebarOpen}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <DrawerHeader />
-        <Box sx={{ padding: 5 }}>
+        <Box sx={{
+          padding: theme.spacing(5),
+          [theme.breakpoints.down('md')]: {
+            padding: theme.spacing(4),
+          },
+          [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(2),
+          },
+        }}
+        >
           {children}
         </Box>
-      </Main>
+      </Box>
     </Box>
   );
 };

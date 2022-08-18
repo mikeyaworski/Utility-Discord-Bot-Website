@@ -17,18 +17,19 @@ import {
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
+import { useIsMobile } from 'hooks';
 import type { SetState } from 'types';
 import { sidebarWidth } from './Sidebar';
 import GuildSelector from './GuildSelector';
 
 interface Props {
-  sidebarOpen: boolean,
   setSidebarOpen: SetState<boolean>,
 }
 
-const Topbar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
+const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
   const { user, refetchUser } = useContext(AuthContext);
   const theme = useTheme();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   function handleNavigate(route: string) {
@@ -47,29 +48,30 @@ const Topbar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
     }
   }
 
-  const contentWidth = sidebarOpen ? `calc(100% - ${sidebarWidth}px)` : '100%';
-
   return (
-    <AppBar position="fixed" sx={{ width: contentWidth }}>
-      <Toolbar sx={{ gap: 1 }}>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="start"
-          sx={{ mr: 2, ...(sidebarOpen && { display: 'none' }) }}
-          onClick={() => setSidebarOpen(true)}
-        >
-          <MenuIcon />
-        </IconButton>
-        <ButtonBase
-          sx={{ display: 'flex', alignItems: 'center', gap: 2, padding: theme.spacing(0.5, 1) }}
-          onClick={() => handleNavigate('/')}
-        >
-          <img src="logo500.png" alt="Logo" width="22" height="22" />
-          <Typography variant="h6">
-            Utility Discord Bot
-          </Typography>
-        </ButtonBase>
+    <AppBar position="fixed" sx={{ width: '100%' }}>
+      <Toolbar sx={{ gap: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <MenuIcon />
+          </IconButton>
+          {!isMobile && (
+            <ButtonBase
+              sx={{ display: 'flex', alignItems: 'center', gap: 2, padding: theme.spacing(0.5, 1) }}
+              onClick={() => handleNavigate('/')}
+            >
+              <img src="logo500.png" alt="Logo" width="22" height="22" />
+              <Typography variant="h6">
+                Utility Discord Bot
+              </Typography>
+            </ButtonBase>
+          )}
+        </Box>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', pt: 1.5, pb: 1 }}>
           <GuildSelector />
         </Box>
