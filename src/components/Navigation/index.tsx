@@ -34,7 +34,7 @@ interface Props {
 }
 
 const Navigation: React.FC<Props> = ({ children }) => {
-  const { refetchUser } = useContext(AuthContext);
+  const { refetchUser, refetchBotDm } = useContext(AuthContext);
   const theme = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -63,6 +63,8 @@ const Navigation: React.FC<Props> = ({ children }) => {
             document.title,
             window.location.pathname + window.location.search,
           );
+          const user = await refetchUser();
+          if (user) await refetchBotDm();
         } catch (err) {
           error('Error:', err);
         }
@@ -71,7 +73,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
         logIn();
       }
     }
-  }, [refetchUser]);
+  }, [refetchUser, refetchBotDm]);
 
   return (
     <Box sx={{ display: 'flex' }}>
