@@ -1,18 +1,6 @@
 import React from 'react';
 import { Button, Box, Modal, Divider } from '@mui/material';
 
-const boxStyle = {
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
 interface Props {
   open: boolean,
   onClose: () => void,
@@ -47,7 +35,20 @@ const BaseModal: React.FC<Props> = ({
         if (reason !== 'backdropClick' || !disableBackdropDismissal) onClose();
       }}
     >
-      <Box sx={boxStyle}>
+      <Box sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        border: '2px solid #000',
+        boxShadow: 24,
+        p: 4,
+        maxHeight: '95vh',
+        overflow: 'auto',
+      }}
+      >
         {children}
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
