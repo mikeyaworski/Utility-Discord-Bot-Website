@@ -3,6 +3,7 @@ import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
 import type { Guild, Channel } from 'types';
 import { convertDiscordMentionsToReactMentions, getChannelLabel, parseDiscordMentions } from 'utils';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 export function useGetGuild(): (guildId: string | null | undefined) => Guild | null | undefined {
   const { user } = useContext(AuthContext);
@@ -44,4 +45,9 @@ export function useGetChannelLabel(): (channel: Channel) => string {
     if (!channels) return `#${channel.name}`;
     return getChannelLabel(channel, channels);
   }, [channels]);
+}
+
+export function useIsMobile(): boolean {
+  const theme = useTheme();
+  return useMediaQuery(theme.breakpoints.down('md'));
 }
