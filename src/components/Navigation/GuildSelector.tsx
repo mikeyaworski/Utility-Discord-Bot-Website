@@ -42,6 +42,7 @@ const GuildSelector: React.FC = () => {
     <Box sx={{ width: '100%', maxWidth: 400 }}>
       <Autocomplete
         disablePortal
+        autoHighlight
         options={options}
         fullWidth
         disableClearable
