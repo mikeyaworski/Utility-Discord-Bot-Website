@@ -1,0 +1,27 @@
+import React from 'react';
+import { Button, Typography } from '@mui/material';
+import BaseModal, { BaseModalProps } from './Base';
+
+interface Props extends BaseModalProps {
+  title?: string,
+  details?: string,
+}
+
+const ConfirmModal: React.FC<Props> = ({
+  title,
+  details,
+  ...baseModalProps
+}) => {
+  return (
+    <BaseModal {...baseModalProps}>
+      <Typography variant="h6">
+        {title}
+      </Typography>
+      <Typography sx={{ mt: 2 }}>
+        {details}
+      </Typography>
+    </BaseModal>
+  );
+};
+
+export default ConfirmModal;
