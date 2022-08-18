@@ -58,8 +58,11 @@ const Navigation: React.FC<Props> = ({ children }) => {
             method: 'POST',
             body: JSON.stringify(data),
           });
-          window.history.replaceState(null, '', '#');
-          await refetchUser();
+          window.history.pushState(
+            '',
+            document.title,
+            window.location.pathname + window.location.search,
+          );
         } catch (err) {
           error('Error:', err);
         }
