@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeProvider, CssBaseline } from '@mui/material';
+import { AlertProvider } from 'alerts';
 import { AuthProvider } from 'contexts/auth';
 import { GuildProvider } from 'contexts/guild';
 import theme from 'theme';
@@ -11,7 +12,9 @@ const App: React.FC = () => {
       <CssBaseline />
       <AuthProvider>
         <GuildProvider>
-          <Router />
+          <AlertProvider>
+            <Router />
+          </AlertProvider>
         </GuildProvider>
       </AuthProvider>
     </ThemeProvider>

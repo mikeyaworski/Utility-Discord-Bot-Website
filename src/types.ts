@@ -19,20 +19,27 @@ export interface User {
   guilds: Guild[],
 }
 
+export interface Option {
+  label: string,
+  value: string,
+}
+
+export interface ReminderModel {
+  id: string,
+  guild_id: string | null,
+  channel_id: string,
+  owner_id: string,
+  time: number,
+  end_time: number | null,
+  max_occurrences: number | null,
+  interval: number | null,
+  message: string | null,
+  createdAt: string,
+  updatedAt: string,
+}
+
 export interface Reminder {
-  model: {
-    id: string,
-    guild_id: string | null,
-    channel_id: string,
-    owner_id: string,
-    time: number,
-    end_time: number | null,
-    max_occurrences: number | null,
-    interval: number | null,
-    message: string | null,
-    createdAt: string,
-    updatedAt: string,
-  },
+  model: ReminderModel,
   nextRun: number | null | undefined,
 }
 
@@ -48,10 +55,22 @@ export interface Channel {
   id: string,
   name: string,
   type: ChannelType,
-  parent: {
+  parent: null | {
     id: string,
     name: string,
-  } | null,
+  },
+}
+
+export interface Role {
+  id: string,
+  name: string,
+  mentionable: boolean,
+}
+
+export interface Member {
+  id: string,
+  name: string,
+  avatar: string | null,
 }
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;

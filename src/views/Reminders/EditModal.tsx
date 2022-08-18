@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { Reminder } from 'types';
 import { Typography } from '@mui/material';
+import { useConvertDiscordMentionsToReactMentions } from 'hooks';
+import { convertReactMentionsToDiscordMentions } from 'utils';
 import ModalInputs from './ModalInputs';
 
 type Props = Omit<BaseModalProps, 'onConfirm'> & {
@@ -14,7 +16,9 @@ const EditReminderModal: React.FC<Props> = ({
   onConfirm,
   ...baseModalProps
 }) => {
-  const [message, setMessage] = useState<string>(reminder.model.message || '');
+  const convertDiscordMentionsToReactMentions = useConvertDiscordMentionsToReactMentions();
+
+  const [message, setMessage] = useState<string>(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
   const [time, setTime] = useState<number>(reminder.model.time);
   const [interval, setInterval] = useState<number | null>(reminder.model.interval);
   const [endTime, setEndTime] = useState<number | null>(reminder.model.end_time);
@@ -22,13 +26,13 @@ const EditReminderModal: React.FC<Props> = ({
   const [channelId, setChannelId] = useState<string>(reminder.model.channel_id);
 
   useEffect(() => {
-    setMessage(reminder.model.message || '');
+    setMessage(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
     setTime(reminder.model.time);
     setInterval(reminder.model.interval);
     setEndTime(reminder.model.end_time);
     setMaxOccurrences(reminder.model.max_occurrences);
     setChannelId(reminder.model.channel_id);
-  }, [reminder]);
+  }, [reminder, convertDiscordMentionsToReactMentions]);
 
   function handleConfirm() {
     const timeMaybeChanged = reminder.model.time !== time
@@ -36,12 +40,13 @@ const EditReminderModal: React.FC<Props> = ({
       || reminder.model.end_time !== endTime
       || reminder.model.max_occurrences !== maxOccurrences;
     const nextRun = timeMaybeChanged ? null : reminder.nextRun;
+    const formattedMessage = convertReactMentionsToDiscordMentions(message);
     onConfirm({
       ...reminder,
       nextRun,
       model: {
         ...reminder.model,
-        message,
+        message: formattedMessage,
         time,
         interval,
         end_time: endTime,
@@ -52,7 +57,11 @@ const EditReminderModal: React.FC<Props> = ({
   }
 
   return (
-    <BaseModal {...baseModalProps} onConfirm={() => handleConfirm()}>
+    <BaseModal
+      {...baseModalProps}
+      onConfirm={() => handleConfirm()}
+      canConfirm={Boolean(channelId) && Boolean(time)}
+    >
       <Typography variant="h5" sx={{ mb: 2 }}>Edit Reminder</Typography>
       <ModalInputs
         message={message}
@@ -65,6 +74,8 @@ const EditReminderModal: React.FC<Props> = ({
         onEndTimeChange={setEndTime}
         maxOccurrences={maxOccurrences}
         onMaxOccurrencesChange={setMaxOccurrences}
+        channelId={channelId}
+        setChannelId={setChannelId}
       />
     </BaseModal>
   );

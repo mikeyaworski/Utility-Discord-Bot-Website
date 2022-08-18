@@ -51,8 +51,6 @@ interface Props {
   setSidebarOpen: SetState<boolean>,
 }
 
-// TODO: Add guild selector to the sidebar
-
 const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
   const theme = useTheme();
   const navigate = useNavigate();

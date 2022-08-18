@@ -21,7 +21,9 @@ interface Props {
   confirmColor?: 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning',
   confirmIcon?: React.ReactNode,
   busy?: boolean,
+  canConfirm?: boolean,
   children: React.ReactNode,
+  disableBackdropDismissal?: boolean,
 }
 
 export type BaseModalProps = Omit<Props, 'children'>;
@@ -34,10 +36,17 @@ const BaseModal: React.FC<Props> = ({
   confirmText = 'Confirm',
   confirmIcon,
   busy = false,
+  canConfirm = true,
+  disableBackdropDismissal = false,
   children,
 }) => {
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal
+      open={open}
+      onClose={(event, reason) => {
+        if (reason !== 'backdropClick' || !disableBackdropDismissal) onClose();
+      }}
+    >
       <Box sx={boxStyle}>
         {children}
         <Divider sx={{ my: 2 }} />
@@ -49,7 +58,7 @@ const BaseModal: React.FC<Props> = ({
             color={confirmColor}
             startIcon={confirmIcon}
             onClick={onConfirm}
-            disabled={busy}
+            disabled={busy || !canConfirm}
           >
             {confirmText}
           </Button>

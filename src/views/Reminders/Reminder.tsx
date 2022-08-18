@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import get from 'lodash.get';
 import {
   Box,
   Card,
@@ -15,7 +16,8 @@ import {
 import type { Reminder } from 'types';
 import ConfirmModal from 'modals/Confirm';
 import { fetchApi, humanizeDuration, getDateString } from 'utils';
-import { useChannel } from 'hooks';
+import { useChannel, useGetChannelLabel } from 'hooks';
+import { useAlert } from 'alerts';
 import EditModal from './EditModal';
 
 interface Props {
@@ -25,12 +27,15 @@ interface Props {
 }
 
 const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminderDeleted }) => {
+  const alert = useAlert();
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteModalBusy, setDeleteModalBusy] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editModalBusy, setEditModalBusy] = useState(false);
 
   const channel = useChannel(reminder.model.channel_id);
+  const getChannelLabel = useGetChannelLabel();
 
   const handleEdit = useCallback(async (newReminder: Reminder) => {
     setEditModalBusy(true);
@@ -46,14 +51,26 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
 
   const handleDelete = useCallback(async () => {
     setDeleteModalBusy(true);
-    await fetchApi({
-      method: 'DELETE',
-      path: `/reminders/${reminder.model.id}`,
-    });
-    setDeleteModalOpen(false);
-    onReminderDeleted();
-    setDeleteModalBusy(false);
-  }, [onReminderDeleted, reminder.model.id]);
+    try {
+      await fetchApi({
+        method: 'DELETE',
+        path: `/reminders/${reminder.model.id}`,
+      });
+      setDeleteModalBusy(false);
+      setDeleteModalOpen(false);
+      onReminderDeleted();
+    } catch (err) {
+      // The reminder probably already went off
+      if (get(err, 'status') === 404) {
+        setDeleteModalBusy(false);
+        setDeleteModalOpen(false);
+        onReminderDeleted();
+      } else {
+        setDeleteModalBusy(false);
+        alert.error(`Something went wrong: ${get(err, 'status')}`);
+      }
+    }
+  }, [onReminderDeleted, reminder.model.id, alert]);
 
   const [remainingTime, setRemainingTime] = useState<number>((reminder.model.time * 1000) - Date.now());
   const [nextRunRemaining, setNextRunRemaining] = useState<number | null>(reminder.nextRun
@@ -154,7 +171,7 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
             <Box sx={{ width: '100%' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Channel</Typography>
               <Typography variant="body2">
-                {channel ? `#${channel.name}` : 'Unknown'}
+                {channel ? getChannelLabel(channel) : 'Unknown'}
               </Typography>
             </Box>
           </Box>

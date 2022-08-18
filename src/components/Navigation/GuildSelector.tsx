@@ -4,13 +4,9 @@ import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
 import { getGuildIcon } from 'utils';
 import { useGetGuild, useGuild } from 'hooks';
+import type { Option } from 'types';
 
 const avatarSize = 24;
-
-interface Option {
-  label: string,
-  value: string,
-}
 
 const GuildSelector: React.FC = () => {
   const { selectGuild } = useContext(GuildContext);
@@ -75,6 +71,15 @@ const GuildSelector: React.FC = () => {
                   {getAvatar(guild?.id)}
                 </InputAdornment>
               ),
+            }}
+            // eslint-disable-next-line react/jsx-no-duplicate-props
+            inputProps={{
+              ...params.inputProps,
+              style: {
+                ...params.inputProps.style,
+                paddingTop: 0,
+                paddingBottom: 0,
+              },
             }}
           />
         )}
