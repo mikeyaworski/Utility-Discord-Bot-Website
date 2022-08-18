@@ -110,7 +110,7 @@ const Reminders: React.FC = () => {
       </Box>
       <Fab
         color="primary"
-        sx={{ position: 'absolute', right: 40, bottom: 40 }}
+        sx={{ position: 'fixed', right: 40, bottom: 40 }}
         onClick={() => setCreateModalOpen(true)}
         disabled={!user}
       >
