@@ -41,9 +41,9 @@ export const GuildProvider: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!user) return () => {};
     if (!selectedGuildId) {
-      setChannels(old => (old ? [] : old));
-      setRoles(old => (old ? [] : old));
-      setMembers(old => (old ? [] : old));
+      setChannels([]);
+      setRoles([]);
+      setMembers([]);
       localStorage.removeItem(localStorageKey);
       return () => {};
     }
