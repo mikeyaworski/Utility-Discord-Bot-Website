@@ -2,7 +2,7 @@ import { useCallback, useContext } from 'react';
 import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
 import type { Guild, Channel } from 'types';
-import { convertDiscordMentionsToReactMentions, getChannelLabel } from 'utils';
+import { convertDiscordMentionsToReactMentions, getChannelLabel, parseDiscordMentions } from 'utils';
 
 export function useGetGuild(): (guildId: string | null | undefined) => Guild | null | undefined {
   const { user } = useContext(AuthContext);
@@ -27,6 +27,14 @@ export function useConvertDiscordMentionsToReactMentions(): (data: string) => st
   return useCallback((data: string) => {
     if (!members || !roles || !channels) return null;
     return convertDiscordMentionsToReactMentions(data, { roles, members, channels });
+  }, [roles, members, channels]);
+}
+
+export function useParseDiscordMentions(): (data: string) => ReturnType<typeof parseDiscordMentions> {
+  const { members, roles, channels } = useContext(GuildContext);
+  return useCallback((data: string) => {
+    if (!members || !roles || !channels) return [];
+    return parseDiscordMentions(data, { roles, members, channels });
   }, [roles, members, channels]);
 }
 

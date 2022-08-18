@@ -14,10 +14,12 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import type { Reminder } from 'types';
-import ConfirmModal from 'modals/Confirm';
 import { fetchApi, humanizeDuration, getDateString } from 'utils';
-import { useChannel, useGetChannelLabel } from 'hooks';
+import { useChannel, useGetChannelLabel, useParseDiscordMentions } from 'hooks';
 import { useAlert } from 'alerts';
+import Message from 'components/Message';
+import Mention from 'components/Mention';
+import ConfirmModal from 'modals/Confirm';
 import EditModal from './EditModal';
 
 interface Props {
@@ -93,6 +95,9 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
     ? `${getDateString(reminder.model.time)}\n(${humanizeDuration(remainingTime)})`
     : getDateString(reminder.model.time);
 
+  const parseDiscordMentions = useParseDiscordMentions();
+  const messageParts = parseDiscordMentions(reminder.model.message || 'Timer is up!');
+
   return (
     <>
       <ConfirmModal
@@ -126,7 +131,9 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             <Box sx={{ width: '100%' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Message</Typography>
-              <Typography variant="body2">{reminder.model.message || 'Timer is up!'}</Typography>
+              <Typography variant="body2" sx={{ lineHeight: '1.6' }}>
+                <Message parts={messageParts} />
+              </Typography>
             </Box>
             <Box sx={{ width: '100%' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Time</Typography>
@@ -168,12 +175,14 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
                 </Typography>
               </Box>
             )}
-            <Box sx={{ width: '100%' }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Channel</Typography>
-              <Typography variant="body2">
-                {channel ? getChannelLabel(channel) : 'Unknown'}
-              </Typography>
-            </Box>
+            {channel && (
+              <Box sx={{ width: '100%' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Channel</Typography>
+                <Typography variant="body2">
+                  <Mention value={getChannelLabel(channel)} />
+                </Typography>
+              </Box>
+            )}
           </Box>
         </CardContent>
         <CardActions sx={{ mt: 'auto' }}>

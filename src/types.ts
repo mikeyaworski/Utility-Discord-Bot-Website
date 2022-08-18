@@ -74,3 +74,15 @@ export interface Member {
 }
 
 export type SetState<T> = Dispatch<SetStateAction<T>>;
+
+export enum MessagePartType {
+  RAW,
+  ROLE_MENTION,
+  MEMBER_MENTION,
+  CHANNEL_MENTION,
+}
+
+export interface MessagePart {
+  type: MessagePartType,
+  value: string,
+}

@@ -1,4 +1,4 @@
-import { Guild, Role, Member, Channel, ChannelType } from 'types';
+import { Guild, Role, Member, Channel, ChannelType, MessagePartType, MessagePart } from 'types';
 import humanizeDurationUtil from 'humanize-duration';
 
 export async function fetchApi<T = unknown>({
@@ -135,6 +135,85 @@ export function convertDiscordMentionsToReactMentions(
     if (channel) data = data.replace(mention, `@[#${channel.name}](${mention})`);
   });
   return data;
+}
+
+/**
+ * Returns an array representing strings that can be concatenated together, but each
+ * element is either a raw string, or a mention.
+ */
+export function parseDiscordMentions(
+  data: string,
+  {
+    roles,
+    members,
+    channels,
+  }: {
+    roles: Role[],
+    members: Member[],
+    channels: Channel[],
+  },
+): MessagePart[] {
+  const mentions = data.match(/(<@!(\d+)>)|(<@&(\d+)>)|(<#(\d+)>)/g);
+  if (!mentions) return [{ type: MessagePartType.RAW, value: data }];
+
+  const getIdFromMention = (mention: string) => mention.replace(/[^\d]/g, '');
+  const getMentionType = (mention: string) => {
+    if (mention.startsWith('<@!')) return MessagePartType.MEMBER_MENTION;
+    if (mention.startsWith('<@&')) return MessagePartType.ROLE_MENTION;
+    if (mention.startsWith('<#')) return MessagePartType.CHANNEL_MENTION;
+    return MessagePartType.RAW;
+  };
+
+  const elements: MessagePart[] = [];
+  mentions?.forEach(mention => {
+    const id = getIdFromMention(mention);
+    const type = getMentionType(mention);
+    const idx = data.indexOf(mention);
+
+    const beforePart = data.substring(0, idx);
+    elements.push({
+      type: MessagePartType.RAW,
+      value: beforePart,
+    });
+    data = data.substring(idx);
+
+    let resolvedMention: string | undefined;
+    switch (type) {
+      case MessagePartType.MEMBER_MENTION: {
+        const member = members.find(m => m.id === id);
+        if (member) resolvedMention = `@${member.name}`;
+        break;
+      }
+      case MessagePartType.ROLE_MENTION: {
+        const role = roles.find(m => m.id === id);
+        if (role) resolvedMention = `@${role.name}`;
+        break;
+      }
+      case MessagePartType.CHANNEL_MENTION: {
+        const channel = channels.find(m => m.id === id);
+        if (channel) resolvedMention = `#${channel.name}`;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+    if (resolvedMention) {
+      data = data.substring(mention.length);
+      elements.push({
+        type,
+        value: resolvedMention,
+      });
+    }
+  });
+
+  if (data) {
+    elements.push({
+      type: MessagePartType.RAW,
+      value: data,
+    });
+  }
+  return elements;
 }
 
 export function getChannelLabel(channel: Channel, allChannels: Channel[]): string {
