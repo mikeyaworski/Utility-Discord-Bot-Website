@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IconButton,
-  Drawer,
+  SwipeableDrawer as Drawer,
   List,
   ListItem,
   ListItemButton,
@@ -67,6 +67,7 @@ const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
       anchor="left"
       open={sidebarOpen}
       onClose={() => setSidebarOpen(false)}
+      onOpen={() => setSidebarOpen(true)}
     >
       <DrawerHeader>
         <IconButton onClick={() => setSidebarOpen(false)}>
