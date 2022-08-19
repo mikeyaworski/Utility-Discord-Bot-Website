@@ -33,7 +33,7 @@ const GuildSelector: React.FC = () => {
           borderRadius: !avatarGuild ? 0 : undefined,
         }}
         alt="Avatar"
-        src={avatarGuild ? getGuildIcon(avatarGuild) : '/logo500.png'}
+        src={avatarGuild ? getGuildIcon(avatarGuild) : '/logo32.png'}
       />
     );
   }

@@ -65,7 +65,7 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
               sx={{ display: 'flex', alignItems: 'center', gap: 2, padding: theme.spacing(0.5, 1) }}
               onClick={() => handleNavigate('/')}
             >
-              <img src="logo500.png" alt="Logo" width="22" height="22" />
+              <img src="logo32.png" alt="Logo" width="22" height="22" />
               <Typography variant="h6">
                 Utility Discord Bot
               </Typography>
