@@ -1,5 +1,7 @@
 import { Guild, Role, Member, Channel, ChannelType, MessagePartType, MessagePart } from 'types';
 import humanizeDurationUtil from 'humanize-duration';
+import { parseDate } from 'chrono-node';
+import type { Falsy } from 'types';
 
 export async function fetchApi<T = unknown>({
   path,
@@ -230,4 +232,22 @@ export function getChannelLabel(channel: Channel, allChannels: Channel[]): strin
     ? `${baseLabel} (${parentCategory.name})`
     : baseLabel;
   return label;
+}
+
+export function filterOutFalsy<T>(
+  items: (T | Falsy)[],
+): Exclude<T, Falsy>[] {
+  return items.filter(item => Boolean(item)) as Exclude<T, Falsy>[];
+}
+
+export function parseTimeInput(input: string): number {
+  let date = parseDate(input);
+  if (!date) {
+    try {
+      date = new Date(Date.now() + parseDelay(input));
+    } catch (err) {
+      throw new Error('Could not parse reminder time!');
+    }
+  }
+  return Math.floor(date.getTime() / 1000);
 }

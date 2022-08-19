@@ -3,6 +3,8 @@ import type { Dispatch, SetStateAction } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalAny = any;
 
+export type Falsy = | undefined | '' | false | null | 0;
+
 // https://discord.com/developers/docs/resources/guild#guild-object
 export interface Guild {
   id: string,

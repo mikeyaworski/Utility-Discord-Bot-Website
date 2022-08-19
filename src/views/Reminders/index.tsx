@@ -40,19 +40,22 @@ const Reminders: React.FC = () => {
     });
   }, [user, selectedGuildId]);
 
-  const handleCreate = useCallback((payload: CreateReminderPayload) => {
+  const handleCreate = useCallback(async (payloads: CreateReminderPayload[]) => {
     setCreateModalBusy(true);
-    fetchApi<Reminder>({
+    const newReminders = await Promise.all(payloads.map(payload => fetchApi<Reminder>({
       method: 'POST',
       path: '/reminders',
       body: JSON.stringify(payload),
-    }).then(newReminder => {
-      setReminders(old => old.concat(newReminder));
-      setCreateModalBusy(false);
-      setCreateModalOpen(false);
-      alert.success('Reminder created!');
-    });
+    })));
+    setReminders(old => old.concat(newReminders));
+    setCreateModalBusy(false);
+    setCreateModalOpen(false);
+    alert.success(newReminders.length > 1 ? `${newReminders.length} reminders created!` : 'Reminder created!');
   }, [alert]);
+
+  const onReminderCreated = useCallback((reminder: Reminder) => {
+    setReminders(old => old.concat(reminder));
+  }, []);
 
   const onReminderUpdated = useCallback((reminder: Reminder) => {
     setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? reminder : oldReminder)));
@@ -103,6 +106,7 @@ const Reminders: React.FC = () => {
           <ReminderCard
             key={reminder.model.id}
             reminder={reminder}
+            onReminderCreated={onReminderCreated}
             onReminderUpdated={onReminderUpdated}
             onReminderDeleted={() => onReminderDeleted(reminder.model.id)}
           />

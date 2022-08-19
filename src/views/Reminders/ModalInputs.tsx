@@ -1,10 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Box, InputAdornment, TextField, IconButton, Autocomplete, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Clear as ClearIcon } from '@mui/icons-material';
-import { getChannelLabel, parseDelay } from 'utils';
+import {
+  Clear as ClearIcon,
+  SwapHoriz as SwapHorizIcon,
+} from '@mui/icons-material';
+import { filterOutFalsy, getChannelLabel, parseDelay, parseTimeInput } from 'utils';
 import MentionableInput from 'components/MentionableInput';
 import { GuildContext } from 'contexts/guild';
 import type { Option } from 'types';
@@ -14,8 +17,8 @@ interface Props {
   onMessageChange: (message: string) => void,
   interval: number | null,
   onIntervalChange: (interval: number | null) => void,
-  time: number | null,
-  onTimeChange: (time: number) => void,
+  times: number[],
+  onTimesChange: (times: number[]) => void,
   endTime: number | null,
   onEndTimeChange: (endTime: number | null) => void,
   maxOccurrences: number | null,
@@ -29,8 +32,8 @@ const ModalInputs: React.FC<Props> = ({
   onMessageChange,
   interval,
   onIntervalChange,
-  time,
-  onTimeChange,
+  times,
+  onTimesChange,
   endTime,
   onEndTimeChange,
   maxOccurrences,
@@ -40,14 +43,39 @@ const ModalInputs: React.FC<Props> = ({
 }) => {
   const { channels, selectedGuildId } = useContext(GuildContext);
   const [intervalInput, setIntervalInput] = useState(interval ? `${interval}s` : '');
+  const [showMultiTimeInput, setShowMultiTimeInput] = useState<boolean>(() => localStorage.getItem('showMultiTimeInput') === 'true' || false);
+  const [timesMultiInput, setTimesMultiInput] = useState<string[]>(() => times.map(time => new Date(time * 1000).toISOString()));
+
+  function getTimeFromTimeInput(input: string): number | null {
+    try {
+      return parseTimeInput(input);
+    } catch {
+      return null;
+    }
+  }
+
+  const handleTimeSwap = useCallback(() => {
+    setShowMultiTimeInput(old => {
+      const newShowMulti = !old;
+      if (newShowMulti) {
+        onTimesChange(filterOutFalsy(timesMultiInput
+          .map(input => getTimeFromTimeInput(input))));
+      } else if (timesMultiInput.length > 0) {
+        onTimesChange(filterOutFalsy([getTimeFromTimeInput(timesMultiInput[0])]));
+      }
+      return newShowMulti;
+    });
+  }, [timesMultiInput, onTimesChange]);
+
+  useEffect(() => {
+    localStorage.setItem('showMultiTimeInput', String(showMultiTimeInput));
+  }, [showMultiTimeInput]);
 
   const channelOptions: Option[] = channels?.map(channel => ({
     label: getChannelLabel(channel, channels),
     value: channel.id,
   })) || [];
 
-  // TODO: Add the ability to create multiple time inputs. Could have freeform text like on the
-  // discord UI (but use tags input), or have a plus button to add another time input.
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -55,16 +83,55 @@ const ModalInputs: React.FC<Props> = ({
           value={message}
           onChange={onMessageChange}
         />
-        <DateTimePicker
-          label="Time"
-          value={time != null ? time * 1000 : null}
-          onChange={newTime => {
-            if (newTime) {
-              onTimeChange(newTime / 1000);
-            }
-          }}
-          renderInput={params => <TextField {...params} />}
-        />
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          width: '100%',
+          '& > div:first-child': {
+            flexGrow: 1,
+          },
+        }}
+        >
+          {showMultiTimeInput ? (
+            <Autocomplete
+              multiple
+              options={[]}
+              freeSolo
+              autoSelect
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Time"
+                  variant="outlined"
+                  placeholder={'"5 mins" or "Friday at 2pm"'}
+                  error={timesMultiInput.length !== times.length}
+                />
+              )}
+              onChange={(event, values) => {
+                setTimesMultiInput(values.flat());
+                onTimesChange(filterOutFalsy(values.flat().map(value => getTimeFromTimeInput(value))));
+              }}
+              value={timesMultiInput}
+            />
+          ) : (
+            <DateTimePicker
+              label="Time"
+              value={times[0] != null ? times[0] * 1000 : null}
+              onChange={newTime => {
+                if (newTime) {
+                  onTimesChange([newTime / 1000]);
+                }
+              }}
+              renderInput={params => <TextField {...params} />}
+            />
+          )}
+          <Tooltip title="Swap time between multi-input and single-input">
+            <IconButton onClick={handleTimeSwap}>
+              <SwapHorizIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Tooltip title={'Interval to send reminder on repeat. Examples: "24 hours" or "8640000"'}>
           <TextField
             value={intervalInput}

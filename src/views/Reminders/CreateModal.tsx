@@ -12,7 +12,7 @@ export type Payload = Omit<ReminderModel, 'id' | 'guild_id' | 'owner_id' | 'crea
 };
 
 type Props = Omit<BaseModalProps, 'onConfirm'> & {
-  onConfirm: (payload: Payload) => void,
+  onConfirm: (payloads: Payload[]) => void,
 }
 
 const CreateReminderModal: React.FC<Props> = ({
@@ -23,7 +23,7 @@ const CreateReminderModal: React.FC<Props> = ({
   const { botDmChannelId } = useContext(AuthContext);
 
   const [message, setMessage] = useState<string>('');
-  const [time, setTime] = useState<number | null>(null);
+  const [times, setTimes] = useState<number[]>([]);
   const [interval, setInterval] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(null);
@@ -32,19 +32,19 @@ const CreateReminderModal: React.FC<Props> = ({
     return null;
   });
 
-  const canConfirm = Boolean(time) && Boolean(channelId);
+  const canConfirm = Boolean(times[0]) && Boolean(channelId);
 
   function handleConfirm() {
     const formattedMessage = convertReactMentionsToDiscordMentions(message);
-    if (time && channelId) {
-      onConfirm({
+    if (times.length > 0 && channelId) {
+      onConfirm(times.filter(Boolean).map(time => ({
         message: formattedMessage,
         time,
         interval,
         end_time: endTime,
         max_occurrences: maxOccurrences,
         channel_id: channelId,
-      });
+      })));
     }
   }
 
@@ -61,8 +61,8 @@ const CreateReminderModal: React.FC<Props> = ({
         onMessageChange={setMessage}
         interval={interval}
         onIntervalChange={setInterval}
-        time={time}
-        onTimeChange={setTime}
+        times={times}
+        onTimesChange={setTimes}
         endTime={endTime}
         onEndTimeChange={setEndTime}
         maxOccurrences={maxOccurrences}

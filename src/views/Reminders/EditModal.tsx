@@ -5,10 +5,11 @@ import { Typography } from '@mui/material';
 import { useConvertDiscordMentionsToReactMentions } from 'hooks';
 import { convertReactMentionsToDiscordMentions } from 'utils';
 import ModalInputs from './ModalInputs';
+import type { Payload } from './CreateModal';
 
 type Props = Omit<BaseModalProps, 'onConfirm'> & {
   reminder: Reminder,
-  onConfirm: (newReminder: Reminder) => void,
+  onConfirm: (editedReminder: Reminder, newReminders: Payload[]) => void,
 }
 
 const EditReminderModal: React.FC<Props> = ({
@@ -19,7 +20,7 @@ const EditReminderModal: React.FC<Props> = ({
   const convertDiscordMentionsToReactMentions = useConvertDiscordMentionsToReactMentions();
 
   const [message, setMessage] = useState<string>(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
-  const [time, setTime] = useState<number>(reminder.model.time);
+  const [times, setTimes] = useState<number[]>([reminder.model.time]);
   const [interval, setInterval] = useState<number | null>(reminder.model.interval);
   const [endTime, setEndTime] = useState<number | null>(reminder.model.end_time);
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(reminder.model.max_occurrences);
@@ -27,7 +28,7 @@ const EditReminderModal: React.FC<Props> = ({
 
   useEffect(() => {
     setMessage(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
-    setTime(reminder.model.time);
+    setTimes([reminder.model.time]);
     setInterval(reminder.model.interval);
     setEndTime(reminder.model.end_time);
     setMaxOccurrences(reminder.model.max_occurrences);
@@ -35,7 +36,10 @@ const EditReminderModal: React.FC<Props> = ({
   }, [reminder, convertDiscordMentionsToReactMentions]);
 
   function handleConfirm() {
-    const timeMaybeChanged = reminder.model.time !== time
+    if (times.length === 0) return;
+    const [editedTime, ...newTimes] = times;
+    const timeMaybeChanged = reminder.model.time !== editedTime
+      || newTimes.length > 0
       || reminder.model.interval !== interval
       || reminder.model.end_time !== endTime
       || reminder.model.max_occurrences !== maxOccurrences;
@@ -47,20 +51,27 @@ const EditReminderModal: React.FC<Props> = ({
       model: {
         ...reminder.model,
         message: formattedMessage,
-        time,
+        time: editedTime,
         interval,
         end_time: endTime,
         max_occurrences: maxOccurrences,
         channel_id: channelId,
       },
-    });
+    }, newTimes.map(time => ({
+      message: formattedMessage,
+      time,
+      interval,
+      end_time: endTime,
+      max_occurrences: maxOccurrences,
+      channel_id: channelId,
+    })));
   }
 
   return (
     <BaseModal
       {...baseModalProps}
       onConfirm={() => handleConfirm()}
-      canConfirm={Boolean(channelId) && Boolean(time)}
+      canConfirm={Boolean(channelId) && Boolean(times[0])}
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Edit Reminder</Typography>
       <ModalInputs
@@ -68,8 +79,8 @@ const EditReminderModal: React.FC<Props> = ({
         onMessageChange={setMessage}
         interval={interval}
         onIntervalChange={setInterval}
-        time={time}
-        onTimeChange={setTime}
+        times={times}
+        onTimesChange={setTimes}
         endTime={endTime}
         onEndTimeChange={setEndTime}
         maxOccurrences={maxOccurrences}

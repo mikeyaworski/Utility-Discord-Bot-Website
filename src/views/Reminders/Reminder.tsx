@@ -21,14 +21,21 @@ import Message from 'components/Message';
 import Mention from 'components/Mention';
 import ConfirmModal from 'modals/Confirm';
 import EditModal from './EditModal';
+import type { Payload } from './CreateModal';
 
 interface Props {
   reminder: Reminder,
+  onReminderCreated: (reminder: Reminder) => void,
   onReminderUpdated: (reminder: Reminder) => void,
   onReminderDeleted: () => void,
 }
 
-const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminderDeleted }) => {
+const ReminderCard: React.FC<Props> = ({
+  reminder,
+  onReminderCreated,
+  onReminderUpdated,
+  onReminderDeleted,
+}) => {
   const alert = useAlert();
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -39,17 +46,25 @@ const ReminderCard: React.FC<Props> = ({ reminder, onReminderUpdated, onReminder
   const channel = useChannel(reminder.model.channel_id);
   const getChannelLabel = useGetChannelLabel();
 
-  const handleEdit = useCallback(async (newReminder: Reminder) => {
+  const handleEdit = useCallback(async (editedReminder: Reminder, newReminders: Payload[]) => {
     setEditModalBusy(true);
-    await fetchApi({
-      method: 'PUT',
-      path: `/reminders/${newReminder.model.id}`,
-      body: JSON.stringify(newReminder.model),
-    });
-    onReminderUpdated(newReminder);
+    const [_, ...createdReminders] = await Promise.all([
+      fetchApi({
+        method: 'PUT',
+        path: `/reminders/${editedReminder.model.id}`,
+        body: JSON.stringify(editedReminder.model),
+      }),
+      ...newReminders.map(payload => fetchApi<Reminder>({
+        method: 'POST',
+        path: '/reminders',
+        body: JSON.stringify(payload),
+      })),
+    ]);
+    onReminderUpdated(editedReminder);
+    createdReminders.forEach(reminder => onReminderCreated(reminder));
     setEditModalOpen(false);
     setEditModalBusy(false);
-  }, [onReminderUpdated]);
+  }, [onReminderUpdated, onReminderCreated]);
 
   const handleDelete = useCallback(async () => {
     setDeleteModalBusy(true);
