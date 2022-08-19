@@ -11,7 +11,6 @@ import {
   Divider,
   useTheme,
   styled,
-  SvgIconTypeMap,
 } from '@mui/material';
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -19,7 +18,6 @@ import {
   Assignment as RemindersIcon,
 } from '@mui/icons-material';
 import type { SetState } from 'types';
-import GuildSelector from './GuildSelector';
 
 export const sidebarWidth = 240;
 
@@ -29,13 +27,13 @@ interface Route {
   path: string,
 }
 
-const routes: Route[] = [
-  {
+export const routes: readonly Route[] = Object.freeze([
+  Object.freeze({
     icon: RemindersIcon,
     label: 'Reminders',
     path: '/reminders',
-  },
-];
+  }),
+]);
 
 export const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -54,10 +52,6 @@ interface Props {
 const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-
-  function handleNavigate(route: string) {
-    navigate(route);
-  }
 
   return (
     <Drawer
@@ -83,7 +77,7 @@ const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
       <List>
         {routes.map(({ icon: Icon, label, path }) => (
           <ListItem disablePadding key={label}>
-            <ListItemButton onClick={() => handleNavigate(path)}>
+            <ListItemButton onClick={() => navigate(path)}>
               <ListItemIcon>
                 <Icon />
               </ListItemIcon>
