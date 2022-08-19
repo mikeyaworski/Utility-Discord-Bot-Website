@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import get from 'lodash.get';
 import {
   Box,
   Fab,
@@ -37,35 +38,44 @@ const Reminders: React.FC = () => {
       setLoading(false);
     }).catch(err => {
       error(err);
+      alert.error('Failed to fetch reminders');
     });
-  }, [user, selectedGuildId]);
+  }, [user, selectedGuildId, alert]);
 
   const handleCreate = useCallback(async (payloads: CreateReminderPayload[]) => {
     setCreateModalBusy(true);
-    const newReminders = await Promise.all(payloads.map(payload => fetchApi<Reminder>({
-      method: 'POST',
-      path: '/reminders',
-      body: JSON.stringify(payload),
-    })));
-    setReminders(old => old.concat(newReminders));
-    setCreateModalBusy(false);
-    setCreateModalOpen(false);
-    alert.success(newReminders.length > 1 ? `${newReminders.length} reminders created!` : 'Reminder created!');
+    try {
+      const newReminders = await Promise.all(payloads.map(payload => fetchApi<Reminder>({
+        method: 'POST',
+        path: '/reminders',
+        body: JSON.stringify(payload),
+      })));
+      setReminders(old => old.concat(newReminders));
+      setCreateModalBusy(false);
+      setCreateModalOpen(false);
+      alert.success(newReminders.length > 1 ? `${newReminders.length} reminders created!` : 'Reminder created!');
+    } catch (err) {
+      setCreateModalBusy(false);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
+    }
   }, [alert]);
 
   const onReminderCreated = useCallback((reminder: Reminder) => {
     setReminders(old => old.concat(reminder));
   }, []);
 
-  const onReminderUpdated = useCallback((reminder: Reminder) => {
+  const onReminderUpdated = useCallback(async (reminder: Reminder) => {
     setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? reminder : oldReminder)));
     // Refetch the reminder since there is some data that needs to be retrieved from the server, like nextRun
-    fetchApi<Reminder>({
-      path: `/reminders/${reminder.model.id}`,
-    }).then(updatedReminder => {
+    try {
+      const updatedReminder = await fetchApi<Reminder>({
+        path: `/reminders/${reminder.model.id}`,
+      });
       setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? updatedReminder : oldReminder)));
       alert.success('Reminder updated');
-    });
+    } catch (err) {
+      alert.error('Reminder was updated, but could not be refetched. Try refreshing your page.');
+    }
   }, [alert]);
 
   const onReminderDeleted = useCallback((id: string) => {

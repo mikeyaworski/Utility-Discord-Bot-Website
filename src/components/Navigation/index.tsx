@@ -7,8 +7,8 @@ import {
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
-import { useIsMobile } from 'hooks';
-import Sidebar, { sidebarWidth, DrawerHeader } from './Sidebar';
+import { useAlert } from 'alerts';
+import Sidebar, { DrawerHeader } from './Sidebar';
 import Topbar from './Topbar';
 
 const Main = styled('main', { shouldForwardProp: prop => prop !== 'shrunk' })<{
@@ -19,7 +19,6 @@ const Main = styled('main', { shouldForwardProp: prop => prop !== 'shrunk' })<{
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  // marginLeft: `-${sidebarWidth}px`,
   ...(shrunk && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
@@ -34,8 +33,9 @@ interface Props {
 }
 
 const Navigation: React.FC<Props> = ({ children }) => {
-  const { refetchUser, refetchBotDm } = useContext(AuthContext);
+  const alert = useAlert();
   const theme = useTheme();
+  const { refetchUser, refetchBotDm } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -67,13 +67,14 @@ const Navigation: React.FC<Props> = ({ children }) => {
           if (user) await refetchBotDm();
         } catch (err) {
           error('Error:', err);
+          alert.error('Could not log in');
         }
       }
       if (token) {
         logIn();
       }
     }
-  }, [refetchUser, refetchBotDm]);
+  }, [refetchUser, refetchBotDm, alert]);
 
   return (
     <Box sx={{ display: 'flex' }}>

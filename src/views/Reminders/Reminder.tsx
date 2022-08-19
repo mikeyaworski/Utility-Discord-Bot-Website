@@ -48,23 +48,36 @@ const ReminderCard: React.FC<Props> = ({
 
   const handleEdit = useCallback(async (editedReminder: Reminder, newReminders: Payload[]) => {
     setEditModalBusy(true);
-    const [_, ...createdReminders] = await Promise.all([
-      fetchApi({
-        method: 'PUT',
-        path: `/reminders/${editedReminder.model.id}`,
-        body: JSON.stringify(editedReminder.model),
-      }),
-      ...newReminders.map(payload => fetchApi<Reminder>({
-        method: 'POST',
-        path: '/reminders',
-        body: JSON.stringify(payload),
-      })),
-    ]);
-    onReminderUpdated(editedReminder);
-    createdReminders.forEach(reminder => onReminderCreated(reminder));
-    setEditModalOpen(false);
-    setEditModalBusy(false);
-  }, [onReminderUpdated, onReminderCreated]);
+    try {
+      const [_, ...createdReminders] = await Promise.all([
+        fetchApi({
+          method: 'PUT',
+          path: `/reminders/${editedReminder.model.id}`,
+          body: JSON.stringify(editedReminder.model),
+        }),
+        ...newReminders.map(payload => fetchApi<Reminder>({
+          method: 'POST',
+          path: '/reminders',
+          body: JSON.stringify(payload),
+        })),
+      ]);
+      onReminderUpdated(editedReminder);
+      createdReminders.forEach(reminder => onReminderCreated(reminder));
+      setEditModalOpen(false);
+      setEditModalBusy(false);
+    } catch (err) {
+      // The reminder probably already went off
+      if (get(err, 'status') === 404) {
+        setEditModalBusy(false);
+        setEditModalOpen(false);
+        onReminderDeleted();
+        alert.info('Reminder was not found');
+      } else {
+        setEditModalBusy(false);
+        alert.error(`Something went wrong: ${get(err, 'status')}`);
+      }
+    }
+  }, [onReminderUpdated, onReminderCreated, onReminderDeleted, alert]);
 
   const handleDelete = useCallback(async () => {
     setDeleteModalBusy(true);
