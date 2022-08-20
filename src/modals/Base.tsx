@@ -52,7 +52,7 @@ const BaseModal: React.FC<Props> = ({
         {children}
         <Divider sx={{ my: 2 }} />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button color="inherit" onClick={onClose} disabled={busy}>
+          <Button color="inherit" onClick={onClose} disabled={busy} variant="outlined">
             Cancel
           </Button>
           <Button
@@ -60,6 +60,7 @@ const BaseModal: React.FC<Props> = ({
             startIcon={confirmIcon}
             onClick={onConfirm}
             disabled={busy || !canConfirm}
+            variant="contained"
           >
             {confirmText}
           </Button>
