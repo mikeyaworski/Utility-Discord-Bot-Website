@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   IconButton,
   SwipeableDrawer as Drawer,
@@ -15,6 +15,7 @@ import {
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
+  Home as HomeIcon,
   Assignment as RemindersIcon,
 } from '@mui/icons-material';
 import type { SetState } from 'types';
@@ -28,6 +29,11 @@ interface Route {
 }
 
 export const routes: readonly Route[] = Object.freeze([
+  Object.freeze({
+    icon: HomeIcon,
+    label: 'Home',
+    path: '/',
+  }),
   Object.freeze({
     icon: RemindersIcon,
     label: 'Reminders',
@@ -51,7 +57,12 @@ interface Props {
 
 const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
   const theme = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const activeRouteIdx = useMemo(() => {
+    return routes.findIndex(route => route.path === location.pathname);
+  }, [location]);
 
   return (
     <Drawer
@@ -76,13 +87,13 @@ const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
       </DrawerHeader>
       <Divider />
       <List>
-        {routes.map(({ icon: Icon, label, path }) => (
+        {routes.map(({ icon: Icon, label, path }, idx) => (
           <ListItem disablePadding key={label}>
             <ListItemButton onClick={() => navigate(path)}>
               <ListItemIcon>
-                <Icon />
+                <Icon sx={{ color: idx === activeRouteIdx ? theme.palette.primary.main : '#FFFFFF' }} />
               </ListItemIcon>
-              <ListItemText primary={label} />
+              <ListItemText primary={label} sx={{ color: idx === activeRouteIdx ? theme.palette.primary.main : '#FFFFFF' }} />
             </ListItemButton>
           </ListItem>
         ))}
