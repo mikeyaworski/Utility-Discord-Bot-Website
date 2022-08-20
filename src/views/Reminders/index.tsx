@@ -13,6 +13,7 @@ import { fetchApi } from 'utils';
 import { error } from 'logging';
 import { Reminder } from 'types';
 import { useAlert } from 'alerts';
+import SearchInput from 'components/SearchInput';
 import ReminderCard from './Reminder';
 import ReminderCardSkeleton from './ReminderSkeleton';
 import CreateModal, { Payload as CreateReminderPayload } from './CreateModal';
@@ -21,6 +22,7 @@ const Reminders: React.FC = () => {
   const alert = useAlert();
   const { user } = useContext(AuthContext);
   const { selectedGuildId } = useContext(GuildContext);
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -96,6 +98,7 @@ const Reminders: React.FC = () => {
 
   const filteredReminders = reminders
     .filter(r => r.model.guild_id === selectedGuildId)
+    .filter(r => r.model.message?.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       return new Date(a.model.createdAt) < new Date(b.model.createdAt) ? 1 : -1;
     });
@@ -111,6 +114,17 @@ const Reminders: React.FC = () => {
           busy={createModalBusy}
         />
       )}
+      <SearchInput
+        value={search}
+        onChange={newValue => setSearch(newValue)}
+        variant="outlined"
+        label="Search"
+        sx={{
+          mb: 2,
+          width: '100%',
+          maxWidth: 320,
+        }}
+      />
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         {filteredReminders.map(reminder => (
           <ReminderCard
