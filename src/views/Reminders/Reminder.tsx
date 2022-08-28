@@ -115,7 +115,7 @@ const ReminderCard: React.FC<Props> = ({
       setRemainingTime((reminder.model.time * 1000) - Date.now());
       setNextRunRemaining(reminder.nextRun ? reminder.nextRun - Date.now() : null);
       setEndTimeRemaining(reminder.model.end_time ? (reminder.model.end_time * 1000) - Date.now() : null);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(interval);
   }, [reminder]);
 
@@ -136,7 +136,7 @@ const ReminderCard: React.FC<Props> = ({
         details={`"${
           reminder.model.message || 'Timer is up!'
         }" in ${
-          nextRunRemaining
+          nextRunRemaining && nextRunRemaining > 0
             ? humanizeDuration(nextRunRemaining)
             : getDateString(reminder.model.time)
         }`}
@@ -195,7 +195,7 @@ const ReminderCard: React.FC<Props> = ({
                 </Typography>
               </Box>
             )}
-            {reminder.model.interval && nextRunRemaining && (
+            {reminder.model.interval && nextRunRemaining && nextRunRemaining > 0 && (
               <Box sx={{ width: '100%' }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Next Run</Typography>
                 <Typography variant="body2">
