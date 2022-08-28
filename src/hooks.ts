@@ -1,9 +1,10 @@
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
 import type { Guild, Channel } from 'types';
 import { convertDiscordMentionsToReactMentions, getChannelLabel, parseDiscordMentions } from 'utils';
-import { useMediaQuery, useTheme } from '@mui/material';
 
 export function useGetGuild(): (guildId: string | null | undefined) => Guild | null | undefined {
   const { user } = useContext(AuthContext);
@@ -50,4 +51,20 @@ export function useGetChannelLabel(): (channel: Channel) => string {
 export function useIsMobile(): boolean {
   const theme = useTheme();
   return useMediaQuery(theme.breakpoints.down('md'));
+}
+
+export function useSocket(): Socket | undefined {
+  const { user } = useContext(AuthContext);
+  const [socket, setSocket] = useState<Socket>();
+  useEffect(() => {
+    if (!user) return () => {};
+    const newSocket = io(process.env.REACT_APP_API_ROOT!, {
+      withCredentials: true,
+    });
+    setSocket(newSocket);
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [user]);
+  return socket;
 }

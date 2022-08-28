@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import get from 'lodash.get';
+import uniqBy from 'lodash.uniqby';
 import {
   Box,
   Fab,
@@ -12,7 +13,9 @@ import { GuildContext } from 'contexts/guild';
 import { fetchApi } from 'utils';
 import { error } from 'logging';
 import { Reminder } from 'types';
+import { SocketEventTypes } from 'types/sockets';
 import { useAlert } from 'alerts';
+import { useSocket } from 'hooks';
 import SearchInput from 'components/SearchInput';
 import ReminderCard from './Reminder';
 import ReminderCardSkeleton from './ReminderSkeleton';
@@ -27,6 +30,19 @@ const Reminders: React.FC = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createModalBusy, setCreateModalBusy] = useState(false);
+
+  const socket = useSocket();
+  useEffect(() => {
+    socket?.on(SocketEventTypes.REMINDER_CREATED, (data: Reminder) => {
+      setReminders(old => old.concat(data));
+    });
+    socket?.on(SocketEventTypes.REMINDER_UPDATED, (data: Reminder) => {
+      setReminders(old => old.map(r => (r.model.id === data.model.id ? data : r)));
+    });
+    socket?.on(SocketEventTypes.REMINDER_DELETED, (data: { id: string }) => {
+      setReminders(old => old.filter(r => r.model.id !== data.id));
+    });
+  }, [socket]);
 
   useEffect(() => {
     if (!user) return;
@@ -96,7 +112,9 @@ const Reminders: React.FC = () => {
     );
   }
 
-  const filteredReminders = reminders
+  // Reverse before removing duplicates since we assume the last duplicate
+  // is the freshest, and we should keep that one
+  const filteredReminders = uniqBy(reminders.reverse(), r => r.model.id).reverse()
     .filter(r => r.model.guild_id === selectedGuildId)
     .filter(r => r.model.message?.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
