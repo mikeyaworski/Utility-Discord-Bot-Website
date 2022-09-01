@@ -23,6 +23,8 @@ import ReminderCard from './Reminder';
 import ReminderCardSkeleton from './ReminderSkeleton';
 import CreateModal, { Payload as CreateReminderPayload } from './CreateModal';
 
+const sortPrefKey = 'REMINDERS_SORT_PREFERENCE';
+
 enum Sorts {
   CREATED_DESC,
   NEXT_RUN_ASC,
@@ -32,7 +34,11 @@ const Reminders: React.FC = () => {
   const alert = useAlert();
   const { user } = useContext(AuthContext);
   const { selectedGuildId } = useContext(GuildContext);
-  const [sort, setSort] = useState<Sorts>(Sorts.CREATED_DESC);
+  const [sort, setSort] = useState<Sorts>(() => {
+    const pref = window.localStorage.getItem(sortPrefKey);
+    if (pref != null) return Number(pref);
+    return Sorts.NEXT_RUN_ASC;
+  });
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -67,6 +73,10 @@ const Reminders: React.FC = () => {
       alert.error('Failed to fetch reminders');
     });
   }, [user, selectedGuildId, alert]);
+
+  useEffect(() => {
+    window.localStorage.setItem(sortPrefKey, String(sort));
+  }, [sort]);
 
   const handleCreate = useCallback(async (payloads: CreateReminderPayload[]) => {
     setCreateModalBusy(true);
