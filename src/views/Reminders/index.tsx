@@ -2,6 +2,11 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import get from 'lodash.get';
 import uniqBy from 'lodash.uniqby';
 import {
+  Select,
+  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Box,
   Fab,
 } from '@mui/material';
@@ -21,10 +26,16 @@ import ReminderCard from './Reminder';
 import ReminderCardSkeleton from './ReminderSkeleton';
 import CreateModal, { Payload as CreateReminderPayload } from './CreateModal';
 
+enum Sorts {
+  CREATED_DESC,
+  NEXT_RUN_ASC,
+}
+
 const Reminders: React.FC = () => {
   const alert = useAlert();
   const { user } = useContext(AuthContext);
   const { selectedGuildId } = useContext(GuildContext);
+  const [sort, setSort] = useState<Sorts>(Sorts.CREATED_DESC);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -118,7 +129,17 @@ const Reminders: React.FC = () => {
     .filter(r => r.model.guild_id === selectedGuildId)
     .filter(r => r.model.message?.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
-      return new Date(a.model.createdAt) < new Date(b.model.createdAt) ? 1 : -1;
+      switch (sort) {
+        case Sorts.NEXT_RUN_ASC: {
+          const aNextRun = a.nextRun != null ? a.nextRun * 1000 : a.model.time;
+          const bNextRun = b.nextRun != null ? b.nextRun * 1000 : b.model.time;
+          return new Date(aNextRun) < new Date(bNextRun) ? -1 : 1;
+        }
+        case Sorts.CREATED_DESC:
+        default: {
+          return new Date(a.model.createdAt) < new Date(b.model.createdAt) ? 1 : -1;
+        }
+      }
     });
 
   return (
@@ -132,17 +153,27 @@ const Reminders: React.FC = () => {
           busy={createModalBusy}
         />
       )}
-      <SearchInput
-        value={search}
-        onChange={newValue => setSearch(newValue)}
-        variant="outlined"
-        label="Search"
-        sx={{
-          mb: 2,
-          width: '100%',
-          maxWidth: 320,
-        }}
-      />
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 2, gap: 2 }}>
+        <SearchInput
+          value={search}
+          onChange={newValue => setSearch(newValue)}
+          variant="outlined"
+          label="Search"
+          sx={{
+            width: '100%',
+            maxWidth: 320,
+          }}
+        />
+        <TextField
+          select
+          value={sort}
+          label="Sort By"
+          onChange={e => setSort(e.target.value as unknown as Sorts)}
+        >
+          <MenuItem value={Sorts.CREATED_DESC}>Date Created</MenuItem>
+          <MenuItem value={Sorts.NEXT_RUN_ASC}>Next Run Time</MenuItem>
+        </TextField>
+      </Box>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
         {filteredReminders.map(reminder => (
           <ReminderCard
