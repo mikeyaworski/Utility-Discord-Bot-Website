@@ -2,10 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import get from 'lodash.get';
 import uniqBy from 'lodash.uniqby';
 import {
-  Select,
   TextField,
-  FormControl,
-  InputLabel,
   MenuItem,
   Box,
   Fab,
