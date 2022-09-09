@@ -138,8 +138,8 @@ const Reminders: React.FC = () => {
     .sort((a, b) => {
       switch (sort) {
         case Sorts.NEXT_RUN_ASC: {
-          const aNextRun = a.nextRun != null ? a.nextRun * 1000 : a.model.time;
-          const bNextRun = b.nextRun != null ? b.nextRun * 1000 : b.model.time;
+          const aNextRun = a.nextRun != null ? a.nextRun : a.model.time * 1000;
+          const bNextRun = b.nextRun != null ? b.nextRun : b.model.time * 1000;
           return new Date(aNextRun) < new Date(bNextRun) ? -1 : 1;
         }
         case Sorts.CREATED_DESC:
