@@ -26,6 +26,7 @@ const ChannelInput: React.FC<Props> = ({
       options={channelOptions}
       fullWidth
       disableClearable
+      autoHighlight
       renderInput={params => (
         <TextField
           {...params}
@@ -35,7 +36,7 @@ const ChannelInput: React.FC<Props> = ({
       onChange={(event, newValue) => {
         if (newValue) setChannelId(newValue.value);
       }}
-      value={channelOptions.find(o => o.value === channelId)}
+      value={channelOptions.find(o => o.value === channelId) || { label: '', value: '' }}
     />
   );
 };
