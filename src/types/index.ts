@@ -21,9 +21,9 @@ export interface User {
   guilds: Guild[],
 }
 
-export interface Option {
+export interface Option<T = string> {
   label: string,
-  value: string,
+  value: T,
 }
 
 export interface ReminderModel {
