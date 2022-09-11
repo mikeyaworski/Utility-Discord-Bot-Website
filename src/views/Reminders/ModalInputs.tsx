@@ -7,10 +7,10 @@ import {
   Clear as ClearIcon,
   SwapHoriz as SwapHorizIcon,
 } from '@mui/icons-material';
-import { filterOutFalsy, getChannelLabel, parseDelay, parseTimeInput } from 'utils';
+import { filterOutFalsy, parseDelay, parseTimeInput } from 'utils';
 import MentionableInput from 'components/MentionableInput';
 import { GuildContext } from 'contexts/guild';
-import type { Option } from 'types';
+import ChannelInput from 'components/ChannelInput';
 
 interface Props {
   message: string,
@@ -41,7 +41,7 @@ const ModalInputs: React.FC<Props> = ({
   channelId,
   setChannelId,
 }) => {
-  const { channels, selectedGuildId } = useContext(GuildContext);
+  const { selectedGuildId } = useContext(GuildContext);
   const [intervalInput, setIntervalInput] = useState(interval ? `${interval}s` : '');
   const [showMultiTimeInput, setShowMultiTimeInput] = useState<boolean>(() => localStorage.getItem('showMultiTimeInput') === 'true' || false);
   const [timesMultiInput, setTimesMultiInput] = useState<string[]>(() => times.map(time => new Date(time * 1000).toISOString()));
@@ -70,11 +70,6 @@ const ModalInputs: React.FC<Props> = ({
   useEffect(() => {
     localStorage.setItem('showMultiTimeInput', String(showMultiTimeInput));
   }, [showMultiTimeInput]);
-
-  const channelOptions: Option[] = channels?.map(channel => ({
-    label: getChannelLabel(channel, channels),
-    value: channel.id,
-  })) || [];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -179,22 +174,7 @@ const ModalInputs: React.FC<Props> = ({
           }}
         />
         {selectedGuildId && (
-          <Autocomplete
-            disablePortal
-            options={channelOptions}
-            fullWidth
-            disableClearable
-            renderInput={params => (
-              <TextField
-                {...params}
-                label="Channel"
-              />
-            )}
-            onChange={(event, newValue) => {
-              if (newValue) setChannelId(newValue.value);
-            }}
-            value={channelOptions.find(o => o.value === channelId)}
-          />
+          <ChannelInput channelId={channelId} setChannelId={setChannelId} />
         )}
       </Box>
     </LocalizationProvider>
