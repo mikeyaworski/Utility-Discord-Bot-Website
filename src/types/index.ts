@@ -71,6 +71,7 @@ export interface Role {
 
 export interface Member {
   id: string,
+  userId: string,
   name: string,
   avatar: string | null,
 }
