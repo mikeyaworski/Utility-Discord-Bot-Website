@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChessBoard } from '@fortawesome/free-solid-svg-icons';
 import {
   IconButton,
   SwipeableDrawer as Drawer,
@@ -23,21 +25,26 @@ import type { SetState } from 'types';
 export const sidebarWidth = 240;
 
 interface Route {
-  icon: typeof RemindersIcon,
+  icon: React.ReactNode,
   label: string,
   path: string,
 }
 
 export const routes: readonly Route[] = Object.freeze([
   Object.freeze({
-    icon: HomeIcon,
+    icon: <HomeIcon color="inherit" />,
     label: 'Home',
     path: '/',
   }),
   Object.freeze({
-    icon: RemindersIcon,
+    icon: <RemindersIcon color="inherit" />,
     label: 'Reminders',
     path: '/reminders',
+  }),
+  Object.freeze({
+    icon: <FontAwesomeIcon icon={faChessBoard} style={{ width: 22, height: 22, padding: 2 }} color="inherit" />,
+    label: 'Chess',
+    path: '/chess',
   }),
 ]);
 
@@ -87,11 +94,11 @@ const Sidebar: React.FC<Props> = ({ sidebarOpen, setSidebarOpen }) => {
       </DrawerHeader>
       <Divider />
       <List>
-        {routes.map(({ icon: Icon, label, path }, idx) => (
+        {routes.map(({ icon, label, path }, idx) => (
           <ListItem disablePadding key={label}>
             <ListItemButton onClick={() => navigate(path)}>
-              <ListItemIcon>
-                <Icon sx={{ color: idx === activeRouteIdx ? theme.palette.primary.main : '#FFFFFF' }} />
+              <ListItemIcon sx={{ color: idx === activeRouteIdx ? theme.palette.primary.main : '#FFFFFF' }}>
+                {icon}
               </ListItemIcon>
               <ListItemText primary={label} sx={{ color: idx === activeRouteIdx ? theme.palette.primary.main : '#FFFFFF' }} />
             </ListItemButton>

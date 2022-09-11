@@ -40,9 +40,28 @@ export interface ReminderModel {
   updatedAt: string,
 }
 
+export interface ChessGameModel {
+  id: number,
+  guild_id: string,
+  channel_id: string,
+  white_user_id: string | null;
+  black_user_id: string | null;
+  owner_user_id: string;
+  challenged_user_id: string | null;
+  pgn: string;
+  started: boolean;
+  createdAt: string,
+  updatedAt: string,
+}
+
 export interface Reminder {
   model: ReminderModel,
   nextRun: number | null | undefined,
+}
+
+export interface ChessGame {
+  model: ChessGameModel,
+  label: string,
 }
 
 export enum ChannelType {

@@ -62,9 +62,17 @@ const Navigation: React.FC<Props> = ({ children }) => {
     <Box sx={{ display: 'flex' }}>
       <Topbar setSidebarOpen={setSidebarOpen} />
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box
+        component="main"
+        display="flex"
+        flexDirection="column"
+        height="100vh"
+        flexGrow={1}
+      >
         <DrawerHeader />
         <Box sx={{
+          flexGrow: 1,
+          overflow: 'auto',
           padding: theme.spacing(5),
           [theme.breakpoints.down('md')]: {
             padding: theme.spacing(4),

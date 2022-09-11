@@ -8,11 +8,11 @@ const Home: React.FC = () => {
   return (
     <Paper sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
       <List sx={{ width: '100%' }}>
-        {routes.map(({ icon: Icon, label, path }) => (
+        {routes.map(({ icon, label, path }) => (
           <ListItem disablePadding key={label}>
             <ListItemButton onClick={() => navigate(path)}>
               <ListItemIcon>
-                <Icon />
+                {icon}
               </ListItemIcon>
               <ListItemText primary={label} />
             </ListItemButton>

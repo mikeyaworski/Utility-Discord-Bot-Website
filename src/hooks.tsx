@@ -1,10 +1,12 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
-import type { Guild, Channel } from 'types';
+import type { Guild, Channel, SetState } from 'types';
 import { convertDiscordMentionsToReactMentions, getChannelLabel, parseDiscordMentions } from 'utils';
+import ConfirmModal from 'modals/Confirm';
+import { BaseModalProps } from 'modals/Base';
 
 export function useGetGuild(): (guildId: string | null | undefined) => Guild | null | undefined {
   const { user } = useContext(AuthContext);
@@ -67,4 +69,85 @@ export function useSocket(): Socket | undefined {
     };
   }, [user]);
   return socket;
+}
+
+interface UseSetReturn<T> {
+  data: Set<T>,
+  setData: SetState<Set<T>>,
+  add: (newValue: T) => void,
+  remove: (value: T) => void,
+}
+export function useSet<T = unknown>(initialData?: T[]): UseSetReturn<T> {
+  const [data, setData] = useState(new Set<T>(initialData));
+  const add = useCallback((newValue: T) => {
+    setData(old => new Set(old).add(newValue));
+  }, []);
+  const remove = useCallback((value: T) => {
+    setData(old => {
+      const newSet = new Set(old);
+      newSet.delete(value);
+      return newSet;
+    });
+  }, []);
+  return {
+    data,
+    setData,
+    add,
+    remove,
+  };
+}
+
+interface OpenOptions {
+  title?: string,
+  details?: string,
+  onConfirm: () => Promise<void>,
+}
+interface UseConfirmationModalReturn {
+  node: React.ReactNode,
+  open: (options: OpenOptions) => void,
+  close: () => void,
+}
+export function useConfirmationModal(modalProps?: Partial<BaseModalProps>): UseConfirmationModalReturn {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [confirmFn, setConfirmFn] = useState<(() => void) | null>(null);
+  const [title, setTitle] = useState<string | undefined>();
+  const [details, setDetails] = useState<string | undefined>();
+
+  const closeModal = useCallback(() => {
+    setOpen(false);
+    setBusy(false);
+    setConfirmFn(null);
+    setTitle(undefined);
+    setDetails(undefined);
+  }, []);
+
+  const openModal = useCallback((options: OpenOptions) => {
+    setOpen(true);
+    setConfirmFn(() => options.onConfirm);
+    setTitle(options.title);
+    setDetails(options.details);
+  }, []);
+
+  const node = (
+    <ConfirmModal
+      {...modalProps}
+      open={open}
+      busy={busy}
+      onClose={() => setOpen(false)}
+      onConfirm={async () => {
+        setBusy(true);
+        if (confirmFn) confirmFn();
+        setBusy(false);
+        closeModal();
+      }}
+      title={title}
+      details={details}
+    />
+  );
+  return {
+    node,
+    open: openModal,
+    close: closeModal,
+  };
 }
