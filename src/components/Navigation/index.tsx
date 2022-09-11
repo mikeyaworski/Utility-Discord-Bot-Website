@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
   Box,
-  styled,
   useTheme,
 } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
@@ -10,23 +9,6 @@ import { fetchApi } from 'utils';
 import { useAlert } from 'alerts';
 import Sidebar, { DrawerHeader } from './Sidebar';
 import Topbar from './Topbar';
-
-const Main = styled('main', { shouldForwardProp: prop => prop !== 'shrunk' })<{
-  shrunk?: boolean;
-}>(({ theme, shrunk }) => ({
-  flexGrow: 1,
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(shrunk && {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}));
 
 interface Props {
   children: React.ReactNode,
