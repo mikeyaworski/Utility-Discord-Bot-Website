@@ -19,8 +19,7 @@ import { error } from 'logging';
 import { fetchApi } from 'utils';
 import { useIsMobile } from 'hooks';
 import type { SetState } from 'types';
-import { sidebarWidth } from './Sidebar';
-import GuildSelector from './GuildSelector';
+import GuildSelector from 'components/GuildSelector';
 
 interface Props {
   setSidebarOpen: SetState<boolean>,
@@ -73,7 +72,7 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
           )}
         </Box>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', pt: 1.5, pb: 1 }}>
-          <GuildSelector />
+          <GuildSelector dense />
         </Box>
         {user === undefined ? (
           <Skeleton variant="rectangular" width={98} height={37} sx={{ borderRadius: '4px' }} />

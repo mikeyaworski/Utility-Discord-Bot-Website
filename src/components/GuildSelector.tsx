@@ -8,7 +8,13 @@ import type { Option } from 'types';
 
 const avatarSize = 24;
 
-const GuildSelector: React.FC = () => {
+interface Props {
+  dense: boolean,
+}
+
+const GuildSelector: React.FC<Props> = ({
+  dense,
+}) => {
   const { selectGuild } = useContext(GuildContext);
   const { user } = useContext(AuthContext);
   const guild = useGuild();
@@ -76,11 +82,11 @@ const GuildSelector: React.FC = () => {
             // eslint-disable-next-line react/jsx-no-duplicate-props
             inputProps={{
               ...params.inputProps,
-              style: {
+              style: dense ? {
                 ...params.inputProps.style,
                 paddingTop: 0,
                 paddingBottom: 0,
-              },
+              } : params.inputProps.style,
             }}
           />
         )}
