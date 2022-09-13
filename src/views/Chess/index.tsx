@@ -4,6 +4,7 @@ import 'chessground/assets/chessground.cburnett.css';
 import './styles.css';
 
 import React, { useEffect, useState, useMemo, useContext, useCallback } from 'react';
+import cx from 'clsx';
 import get from 'lodash.get';
 import uniqBy from 'lodash.uniqby';
 import { Chess, Color } from 'chess.js';
@@ -62,6 +63,12 @@ function getTurnInfo(userId: string, game: ChessGame) {
 const ChessView: React.FC = () => {
   const { user } = useContext(AuthContext);
   const alert = useAlert();
+
+  // TODO: Support board color and piece preferences
+  const boardClasses = [
+    'brown',
+    'merida',
+  ];
 
   const [busy, setBusy] = useState(false);
   const [challengeModalOpen, setChallengeModalOpen] = useState(false);
@@ -397,6 +404,7 @@ const ChessView: React.FC = () => {
       <Box
         width={height && width && height > width ? '100%' : height}
         height={height && width && height > width ? width : '100%'}
+        className={cx(boardClasses)}
       >
         <Chessground
           contained
