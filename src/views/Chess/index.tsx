@@ -50,7 +50,7 @@ function getDestinations(game: Chess, color: Color): Dests {
 
 function getTurnInfo(userId: string, game: ChessGame) {
   const chess = new Chess();
-  chess.loadPgn(game.model.pgn);
+  chess.loadPgn(game.model.pgn, { sloppy: true });
   const currentTurnUser = chess.turn() === 'w' ? game.model.white_user_id : game.model.black_user_id;
   chess.undo();
   const lastTurnUser = chess.turn() === 'w' ? game.model.white_user_id : game.model.black_user_id;
@@ -124,7 +124,7 @@ const ChessView: React.FC = () => {
 
   const game = useMemo(() => {
     const game = new Chess();
-    if (selectedGame) game.loadPgn(selectedGame.model.pgn);
+    if (selectedGame) game.loadPgn(selectedGame.model.pgn, { sloppy: true });
     return game;
   }, [selectedGame]);
   const dests = getDestinations(game, game.turn());
@@ -145,7 +145,7 @@ const ChessView: React.FC = () => {
   const lastMove = useMemo<Key[] | undefined>(() => {
     if (!selectedGame) return undefined;
     const game = new Chess();
-    game.loadPgn(selectedGame.model.pgn);
+    game.loadPgn(selectedGame.model.pgn, { sloppy: true });
     const lastMove = game.history({ verbose: true }).slice(-1)[0];
     if (!lastMove || typeof lastMove === 'string') return undefined;
     return [lastMove.from as Key, lastMove.to as Key];
