@@ -292,6 +292,50 @@ const ChessView: React.FC = () => {
   const minResizable = 100;
   const maxResizable = Math.min(containerWidth || minResizable, containerHeight || minResizable);
 
+  const chessboard = (
+    <Chessground
+      contained
+      config={{
+        coordinates: false,
+        fen: game.fen(),
+        orientation,
+        lastMove,
+        check: game.isCheck(),
+        turnColor,
+        events: {
+          move: async (from, to) => {
+            game.move({
+              from,
+              to,
+            });
+            updateGameState(game);
+            // If this move ends the game, there is no game response
+            const res = await fetchApi<ChessGame | null>({
+              method: 'POST',
+              path: `/chess/${selectedGameId}/move`,
+              body: JSON.stringify({
+                move: `${from}${to}`,
+              }),
+            });
+            if (res) await handleGameUpdate(res);
+          },
+        },
+        highlight: {
+          lastMove: true,
+          check: true,
+        },
+        movable: {
+          color: turnInfo?.isMyTurn && !viewOnly ? turnColor : undefined,
+          free: false,
+          dests,
+        },
+        premovable: {
+          enabled: false,
+        },
+      }}
+    />
+  );
+
   return (
     <Box ref={containerRef} height="100%" display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" gap={2}>
       {confirmationModal}
@@ -417,56 +461,18 @@ const ChessView: React.FC = () => {
         display="flex"
         alignItems="center"
       >
-        <ResizableBox
-          width={resizableBoxWidth || minResizable}
-          height={resizableBoxHeight || minResizable}
-          minConstraints={[minResizable, minResizable]}
-          maxConstraints={[maxResizable, maxResizable]}
-          lockAspectRatio
-          resizeHandles={isMobile ? [] : ['ne']}
-        >
-          <Chessground
-            contained
-            config={{
-              coordinates: false,
-              fen: game.fen(),
-              orientation,
-              lastMove,
-              check: game.isCheck(),
-              turnColor,
-              events: {
-                move: async (from, to) => {
-                  game.move({
-                    from,
-                    to,
-                  });
-                  updateGameState(game);
-                  // If this move ends the game, there is no game response
-                  const res = await fetchApi<ChessGame | null>({
-                    method: 'POST',
-                    path: `/chess/${selectedGameId}/move`,
-                    body: JSON.stringify({
-                      move: `${from}${to}`,
-                    }),
-                  });
-                  if (res) await handleGameUpdate(res);
-                },
-              },
-              highlight: {
-                lastMove: true,
-                check: true,
-              },
-              movable: {
-                color: turnInfo?.isMyTurn && !viewOnly ? turnColor : undefined,
-                free: false,
-                dests,
-              },
-              premovable: {
-                enabled: false,
-              },
-            }}
-          />
-        </ResizableBox>
+        {isMobile ? chessboard : (
+          <ResizableBox
+            width={resizableBoxWidth || minResizable}
+            height={resizableBoxHeight || minResizable}
+            minConstraints={[minResizable, minResizable]}
+            maxConstraints={[maxResizable, maxResizable]}
+            lockAspectRatio
+            resizeHandles={['ne']}
+          >
+            {chessboard}
+          </ResizableBox>
+        )}
       </Box>
     </Box>
   );
