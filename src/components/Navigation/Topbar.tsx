@@ -89,7 +89,7 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
               process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
             }&redirect_uri=${
               encodeURIComponent(process.env.REACT_APP_REDIRECT_URI!)
-            }&response_type=token&scope=identify%20guilds`}
+            }&response_type=code&scope=identify%20guilds`}
             variant="contained"
             disabled={user === undefined}
           >

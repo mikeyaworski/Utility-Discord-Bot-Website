@@ -21,18 +21,10 @@ const Navigation: React.FC<Props> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (window.location.hash) {
-      const params = new URLSearchParams(window.location.hash.slice(1));
-      const token = params.get('access_token');
-      const tokenType = params.get('token_type');
-      const expiresIn = params.get('expires_in');
-      const scope = params.get('scope');
-      const data = {
-        token,
-        tokenType,
-        expiresIn,
-        scope,
-      };
+    if (window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const data = { code };
       async function logIn() {
         try {
           await fetchApi({
@@ -43,7 +35,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
           window.history.pushState(
             '',
             document.title,
-            window.location.pathname + window.location.search,
+            window.location.pathname,
           );
           const user = await refetchUser();
           if (user) await refetchBotDm();
@@ -52,7 +44,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
           alert.error('Could not log in');
         }
       }
-      if (token) {
+      if (code) {
         logIn();
       }
     }
