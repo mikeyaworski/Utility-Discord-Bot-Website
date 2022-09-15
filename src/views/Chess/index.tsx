@@ -187,8 +187,6 @@ const ChessView: React.FC = () => {
   }
 
   async function acceptChallenge(gameId: ChessGame['model']['id']): Promise<void> {
-    // TODO: There is currently a bug where you cannot make a move after accepting a game
-    // until you refresh the page
     setBusy(true);
     try {
       const res = await fetchApi<ChessGame>({
@@ -283,6 +281,10 @@ const ChessView: React.FC = () => {
     alignItems: 'center',
     gap: 3,
   };
+
+  // Note: Do not use the viewOnly config value in Chessground since it's bugged
+  // and it seems that if it was ever true, then the board will always be view only
+  const viewOnly = game.isGameOver() || resignedGames.has(selectedGameId) || busy;
 
   return (
     <Box ref={ref} height="100%" display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" gap={2}>
@@ -413,7 +415,6 @@ const ChessView: React.FC = () => {
             orientation,
             lastMove,
             check: game.isCheck(),
-            viewOnly: game.isGameOver() || resignedGames.has(selectedGameId) || busy,
             turnColor,
             events: {
               move: async (from, to) => {
@@ -438,7 +439,7 @@ const ChessView: React.FC = () => {
               check: true,
             },
             movable: {
-              color: turnInfo?.isMyTurn ? turnColor : undefined,
+              color: turnInfo?.isMyTurn && !viewOnly ? turnColor : undefined,
               free: false,
               dests,
             },
