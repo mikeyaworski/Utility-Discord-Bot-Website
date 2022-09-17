@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
@@ -150,4 +151,50 @@ export function useConfirmationModal(modalProps?: Partial<BaseModalProps>): UseC
     open: openModal,
     close: closeModal,
   };
+}
+
+interface UseOauthStateReturn {
+  get: () => string | null,
+  set: (state: string) => void,
+  remove: () => void,
+  validate: (state: string) => boolean,
+  state: string | null,
+}
+export function useOauthState(): UseOauthStateReturn {
+  const oauthStateKey = 'oauthState';
+  const get = useCallback(() => {
+    return window.localStorage.getItem(oauthStateKey);
+  }, []);
+  const set = useCallback((state: string) => {
+    window.localStorage.setItem(oauthStateKey, state);
+  }, []);
+  const remove = useCallback(() => {
+    window.localStorage.removeItem(oauthStateKey);
+  }, []);
+  const validate = useCallback((state: string) => {
+    return Boolean(state) && window.localStorage.getItem(oauthStateKey) === state;
+  }, []);
+  return {
+    get,
+    set,
+    remove,
+    validate,
+    state: window.localStorage.getItem(oauthStateKey),
+  };
+}
+
+export function useLogInLink(): string {
+  const location = useLocation();
+  const { state: oauthState } = useOauthState();
+  const state = {
+    redirectPath: location.pathname,
+    oauthState,
+  };
+  return `https://discord.com/api/oauth2/authorize?client_id=${
+    process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
+  }&redirect_uri=${
+    encodeURIComponent(process.env.REACT_APP_REDIRECT_URI!)
+  }&response_type=code&scope=identify%20guilds&state=${
+    JSON.stringify(state)
+  }`;
 }

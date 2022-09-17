@@ -7,5 +7,10 @@ export default createTheme({
       main: '#00A651',
       contrastText: '#FFFFFF',
     },
+    secondary: {
+      // Discord blue
+      main: '#404EED',
+      contrastText: '#FFFFFF',
+    },
   },
 });

@@ -3,9 +3,11 @@ import {
   Box,
   useTheme,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
+import { useOauthState } from 'hooks';
 import { useAlert } from 'alerts';
 import Sidebar, { DrawerHeader } from './Sidebar';
 import Topbar from './Topbar';
@@ -17,6 +19,8 @@ interface Props {
 const Navigation: React.FC<Props> = ({ children }) => {
   const alert = useAlert();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const { validate: validateOauthState } = useOauthState();
   const { refetchUser, refetchBotDm } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -24,6 +28,11 @@ const Navigation: React.FC<Props> = ({ children }) => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
+      const state = params.get('state');
+
+      if (!code || !state) return;
+
+      const { oauthState, redirectPath } = JSON.parse(state);
       const data = { code };
       async function logIn() {
         try {
@@ -37,6 +46,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
             document.title,
             window.location.pathname,
           );
+          if (redirectPath) navigate(redirectPath);
           const user = await refetchUser();
           if (user) await refetchBotDm();
         } catch (err) {
@@ -44,11 +54,10 @@ const Navigation: React.FC<Props> = ({ children }) => {
           alert.error('Could not log in');
         }
       }
-      if (code) {
-        logIn();
-      }
+      if (validateOauthState(oauthState)) logIn();
+      else alert.error('Invalid OAuth State');
     }
-  }, [refetchUser, refetchBotDm, alert]);
+  }, [refetchUser, refetchBotDm, alert, validateOauthState, navigate]);
 
   return (
     <Box sx={{ display: 'flex' }}>

@@ -17,7 +17,7 @@ import {
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
-import { useIsMobile } from 'hooks';
+import { useIsMobile, useLogInLink } from 'hooks';
 import type { SetState } from 'types';
 import GuildSelector from 'components/GuildSelector';
 
@@ -26,7 +26,8 @@ interface Props {
 }
 
 const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
-  const { user, refetchUser } = useContext(AuthContext);
+  const { user, hasFetched, refetchUser } = useContext(AuthContext);
+  const logInLink = useLogInLink();
   const theme = useTheme();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', pt: 1.5, pb: 1 }}>
           <GuildSelector dense />
         </Box>
-        {user === undefined ? (
+        {!hasFetched ? (
           <Skeleton variant="rectangular" width={98} height={37} sx={{ borderRadius: '4px' }} />
         ) : user ? (
           <Button
@@ -85,13 +86,9 @@ const Topbar: React.FC<Props> = ({ setSidebarOpen }) => {
           </Button>
         ) : (
           <Button
-            href={`https://discord.com/api/oauth2/authorize?client_id=${
-              process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
-            }&redirect_uri=${
-              encodeURIComponent(process.env.REACT_APP_REDIRECT_URI!)
-            }&response_type=code&scope=identify%20guilds`}
+            href={logInLink}
             variant="contained"
-            disabled={user === undefined}
+            disabled={!hasFetched}
           >
             Log In
           </Button>

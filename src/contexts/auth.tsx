@@ -6,6 +6,8 @@ type RefetchUser = () => Promise<User | null | undefined>;
 type RefetchBotDm = () => Promise<string | null | undefined>;
 
 interface AuthContext {
+  hasFetched: boolean,
+  notLoggedIn: boolean, // definitely not logged in (has fetched and is not logged in)
   user: User | null | undefined,
   refetchUser: RefetchUser,
   botDmChannelId: string | null | undefined,
@@ -13,6 +15,8 @@ interface AuthContext {
 }
 
 export const AuthContext = createContext<AuthContext>({
+  hasFetched: false,
+  notLoggedIn: false,
   user: undefined,
   refetchUser: () => Promise.resolve(undefined),
   botDmChannelId: undefined,
@@ -64,6 +68,8 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   }, [refetchUser, refetchBotDm]);
 
   const value = useMemo(() => ({
+    hasFetched: user !== undefined,
+    notLoggedIn: user === null,
     user,
     refetchUser,
     botDmChannelId,
