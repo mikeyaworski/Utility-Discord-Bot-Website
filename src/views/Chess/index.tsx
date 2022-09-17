@@ -62,7 +62,7 @@ function getTurnInfo(userId: string, game: ChessGame) {
 }
 
 const ChessView: React.FC = () => {
-  const { user } = useContext(AuthContext);
+  const { user, hasFetched } = useContext(AuthContext);
   const alert = useAlert();
   const isMobile = useIsMobile();
 
@@ -264,7 +264,7 @@ const ChessView: React.FC = () => {
           },
         });
       },
-      disabled: resignedGames.has(selectedGame.model.id),
+      disabled: resignedGames.has(selectedGame.model.id) || !hasFetched,
     },
     {
       icon: Undo,
@@ -432,6 +432,7 @@ const ChessView: React.FC = () => {
               <ListItem
                 button
                 onClick={() => setChallengeModalOpen(true)}
+                disabled={!hasFetched}
                 sx={actionItemStyle}
               >
                 <FontAwesomeIcon icon={faChessKing} width={24} height={24} />
