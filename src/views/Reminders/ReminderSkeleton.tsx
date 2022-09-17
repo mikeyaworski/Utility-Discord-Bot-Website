@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Card,
   CardActions,
+  CardHeader,
   CardContent,
   Skeleton,
   IconButton,
@@ -14,12 +15,11 @@ import {
 const ReminderCardSkeleton: React.FC = () => {
   return (
     <Card>
+      <CardHeader title={<Skeleton variant="text" width={250} height={40} />} />
       <CardContent>
-        <Skeleton variant="text" width={250} height={22} />
-        <Skeleton variant="text" width={250} height={22} />
-      </CardContent>
-      <CardContent>
-        <Skeleton variant="rectangular" width={250} height={22} />
+        <Skeleton variant="text" width={250} height={30} />
+        <Skeleton variant="text" width={250} height={30} />
+        <Skeleton variant="text" width={250} height={30} />
       </CardContent>
       <CardActions>
         <IconButton size="small" disabled>

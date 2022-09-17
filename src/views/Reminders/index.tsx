@@ -119,17 +119,6 @@ const Reminders: React.FC = () => {
     alert.success('Reminder deleted');
   }, [alert]);
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        {new Array(3).fill(0).map((_, i) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ReminderCardSkeleton key={i} />
-        ))}
-      </Box>
-    );
-  }
-
   // Reverse before removing duplicates since we assume the last duplicate
   // is the freshest, and we should keep that one
   const filteredReminders = uniqBy(reminders.reverse(), r => r.model.id).reverse()
@@ -182,7 +171,10 @@ const Reminders: React.FC = () => {
         </TextField>
       </Box>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        {filteredReminders.map(reminder => (
+        {loading ? new Array(3).fill(0).map((_, i) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ReminderCardSkeleton key={i} />
+        )) : filteredReminders.map(reminder => (
           <ReminderCard
             key={reminder.model.id}
             reminder={reminder}
