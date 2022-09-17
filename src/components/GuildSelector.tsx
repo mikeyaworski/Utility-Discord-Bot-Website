@@ -16,7 +16,7 @@ const GuildSelector: React.FC<Props> = ({
   dense,
 }) => {
   const { selectGuild } = useContext(GuildContext);
-  const { user } = useContext(AuthContext);
+  const { user, notLoggedIn } = useContext(AuthContext);
   const guild = useGuild();
   const getGuild = useGetGuild();
 
@@ -69,13 +69,11 @@ const GuildSelector: React.FC<Props> = ({
             label="Guild"
             InputProps={{
               ...params.InputProps,
-              startAdornment: !user ? (
+              startAdornment: (
                 <InputAdornment position="start">
-                  <Skeleton variant="circular" width={avatarSize} height={avatarSize} />
-                </InputAdornment>
-              ) : (
-                <InputAdornment position="start">
-                  {getAvatar(guild?.id)}
+                  {notLoggedIn ? null : !user ? (
+                    <Skeleton variant="circular" width={avatarSize} height={avatarSize} />
+                  ) : getAvatar(guild?.id)}
                 </InputAdornment>
               ),
             }}
@@ -92,7 +90,7 @@ const GuildSelector: React.FC<Props> = ({
         )}
         onChange={(event, newValue) => selectGuild(newValue ? newValue.value : null)}
         value={{
-          label: guild?.name || (!user ? 'Loading...' : 'Bot DMs'),
+          label: guild?.name || (notLoggedIn ? '' : !user ? 'Loading...' : 'Bot DMs'),
           value: guild?.id || '',
         }}
       />
