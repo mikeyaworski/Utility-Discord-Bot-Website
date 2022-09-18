@@ -14,7 +14,7 @@ import {
 
 const ReminderCardSkeleton: React.FC = () => {
   return (
-    <Card>
+    <Card sx={{ width: 320 }}>
       <CardHeader title={<Skeleton variant="text" width={250} height={40} />} />
       <CardContent>
         <Skeleton variant="text" width={250} height={30} />
