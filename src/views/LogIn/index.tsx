@@ -4,7 +4,7 @@ import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { useLogInLink } from 'hooks';
 import React from 'react';
 
-const NotLoggedIn: React.FC = () => {
+const LogIn: React.FC = () => {
   const logInLink = useLogInLink();
   return (
     <Box
@@ -32,4 +32,4 @@ const NotLoggedIn: React.FC = () => {
   );
 };
 
-export default NotLoggedIn;
+export default LogIn;

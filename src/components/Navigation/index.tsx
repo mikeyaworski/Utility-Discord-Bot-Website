@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'contexts/auth';
 import { error } from 'logging';
 import { fetchApi } from 'utils';
-import { useOauthState } from 'hooks';
+import { useOauthState, useQueryParam } from 'hooks';
 import { useAlert } from 'alerts';
 import Sidebar, { DrawerHeader } from './Sidebar';
 import Topbar from './Topbar';
@@ -24,40 +24,44 @@ const Navigation: React.FC<Props> = ({ children }) => {
   const { refetchUser, refetchBotDm } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const code = useQueryParam('code');
+  const state = useQueryParam('state');
+
   useEffect(() => {
-    if (window.location.search) {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const state = params.get('state');
-
-      if (!code || !state) return;
-
-      const { oauthState, redirectPath } = JSON.parse(state);
-      const data = { code };
-      async function logIn() {
-        try {
-          await fetchApi({
-            path: '/auth/login',
-            method: 'POST',
-            body: JSON.stringify(data),
-          });
-          window.history.pushState(
-            '',
-            document.title,
-            window.location.pathname,
-          );
-          if (redirectPath) navigate(redirectPath);
-          const user = await refetchUser();
-          if (user) await refetchBotDm();
-        } catch (err) {
-          error('Error:', err);
-          alert.error('Could not log in');
-        }
+    if (!code || !state) return;
+    const { oauthState, redirectPath } = JSON.parse(state);
+    const data = { code };
+    async function logIn() {
+      try {
+        await fetchApi({
+          path: '/auth/login',
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+        window.history.pushState(
+          '',
+          document.title,
+          window.location.pathname,
+        );
+        if (redirectPath) navigate(redirectPath);
+        const user = await refetchUser();
+        if (user) await refetchBotDm();
+      } catch (err) {
+        error('Error:', err);
+        alert.error('Could not log in');
       }
-      if (validateOauthState(oauthState)) logIn();
-      else alert.error('Invalid OAuth State');
     }
-  }, [refetchUser, refetchBotDm, alert, validateOauthState, navigate]);
+    if (validateOauthState(oauthState)) logIn();
+    else alert.error('Invalid OAuth State');
+  }, [
+    code,
+    state,
+    refetchUser,
+    refetchBotDm,
+    alert,
+    validateOauthState,
+    navigate,
+  ]);
 
   return (
     <Box sx={{ display: 'flex' }}>

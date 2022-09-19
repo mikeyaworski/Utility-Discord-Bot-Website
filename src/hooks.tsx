@@ -198,3 +198,8 @@ export function useLogInLink(): string {
     JSON.stringify(state)
   }`;
 }
+
+export function useQueryParam(key: string): string | null {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
