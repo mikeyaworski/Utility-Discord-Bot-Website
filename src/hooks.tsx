@@ -193,7 +193,7 @@ export function useLogInLink(): string {
   return `https://discord.com/api/oauth2/authorize?client_id=${
     process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
   }&redirect_uri=${
-    encodeURIComponent(process.env.REACT_APP_REDIRECT_URI!)
+    window.location.origin
   }&response_type=code&scope=identify%20guilds&state=${
     JSON.stringify(state)
   }`;
