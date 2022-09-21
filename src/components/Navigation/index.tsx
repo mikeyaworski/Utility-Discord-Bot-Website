@@ -30,7 +30,10 @@ const Navigation: React.FC<Props> = ({ children }) => {
   useEffect(() => {
     if (!code || !state) return;
     const { oauthState, redirectPath } = JSON.parse(state);
-    const data = { code };
+    const data = {
+      code,
+      redirectUri: window.location.origin,
+    };
     async function logIn() {
       try {
         await fetchApi({
