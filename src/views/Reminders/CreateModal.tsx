@@ -38,7 +38,7 @@ const CreateReminderModal: React.FC<Props> = ({
     const formattedMessage = convertReactMentionsToDiscordMentions(message);
     if (times.length > 0 && channelId) {
       onConfirm(times.filter(Boolean).map(time => ({
-        message: formattedMessage,
+        message: formattedMessage || null,
         time,
         interval,
         end_time: endTime,
