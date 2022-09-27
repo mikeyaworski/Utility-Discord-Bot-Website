@@ -123,7 +123,7 @@ const Reminders: React.FC = () => {
   // is the freshest, and we should keep that one
   const filteredReminders = uniqBy(reminders.reverse(), r => r.model.id).reverse()
     .filter(r => r.model.guild_id === selectedGuildId)
-    .filter(r => r.model.message?.toLowerCase().includes(search.toLowerCase()))
+    .filter(r => (r.model.message || 'Timer is up!').toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       switch (sort) {
         case Sorts.NEXT_RUN_ASC: {
