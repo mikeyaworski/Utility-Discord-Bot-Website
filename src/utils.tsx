@@ -155,12 +155,13 @@ export function parseDiscordMentions(
     channels: Channel[],
   },
 ): MessagePart[] {
-  const mentions = data.match(/(<@!(\d+)>)|(<@&(\d+)>)|(<#(\d+)>)/g);
+  const mentions = data.match(/(<@!?(\d+)>)|(<@&(\d+)>)|(<#(\d+)>)/g);
   if (!mentions) return [{ type: MessagePartType.RAW, value: data }];
 
   const getIdFromMention = (mention: string) => mention.replace(/[^\d]/g, '');
   const getMentionType = (mention: string) => {
-    if (mention.startsWith('<@!')) return MessagePartType.MEMBER_MENTION;
+    // Mentions may be of the form <@...> or <@!...>
+    if (/^<@[\d!]/.test(mention)) return MessagePartType.MEMBER_MENTION;
     if (mention.startsWith('<@&')) return MessagePartType.ROLE_MENTION;
     if (mention.startsWith('<#')) return MessagePartType.CHANNEL_MENTION;
     return MessagePartType.RAW;
