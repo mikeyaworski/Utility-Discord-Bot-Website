@@ -60,6 +60,7 @@ const Reminders: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
+    setLoading(true);
     fetchApi<Reminder[]>({
       path: '/reminders',
       queryParams: selectedGuildId ? [
