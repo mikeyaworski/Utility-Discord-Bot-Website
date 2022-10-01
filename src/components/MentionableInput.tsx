@@ -4,6 +4,7 @@ import { Box, Theme, Typography, Avatar } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { GuildContext } from 'contexts/guild';
 import type { Member, Channel, Role } from 'types';
+import { useGuildData } from 'hooks';
 
 const useStyles = makeStyles((theme: Theme) => ({
   mentionInput: {
@@ -61,14 +62,28 @@ type ChannelMention = {
 interface Props {
   value: string,
   onChange: (newValue: string) => void,
+  guildId?: string | null,
 }
 
 const MentionableInput: React.FC<Props> = ({
   value,
   onChange,
+  guildId,
 }) => {
   const classes = useStyles();
-  const { roles, members, channels } = useContext(GuildContext);
+  const {
+    members: localMembers,
+    roles: localRoles,
+    channels: localChannels,
+  } = useGuildData(guildId);
+  const {
+    members: globalMembers,
+    roles: globalRoles,
+    channels: globalChannels,
+  } = useContext(GuildContext);
+  const members = guildId !== undefined ? localMembers : globalMembers;
+  const roles = guildId !== undefined ? localRoles : globalRoles;
+  const channels = guildId !== undefined ? localChannels : globalChannels;
 
   const mentionRoles = roles
     ?.filter(role => role.mentionable)

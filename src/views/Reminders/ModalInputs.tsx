@@ -25,6 +25,7 @@ interface Props {
   onMaxOccurrencesChange: (maxOccurrences: number | null) => void,
   channelId: string | null,
   setChannelId: (newChannelId: string) => void,
+  guildId: string | null,
 }
 
 const ModalInputs: React.FC<Props> = ({
@@ -40,8 +41,8 @@ const ModalInputs: React.FC<Props> = ({
   onMaxOccurrencesChange,
   channelId,
   setChannelId,
+  guildId,
 }) => {
-  const { selectedGuildId } = useContext(GuildContext);
   const [intervalInput, setIntervalInput] = useState(interval ? `${interval}s` : '');
   const [showMultiTimeInput, setShowMultiTimeInput] = useState<boolean>(() => localStorage.getItem('showMultiTimeInput') === 'true' || false);
   const [timesMultiInput, setTimesMultiInput] = useState<string[]>(() => times.map(time => new Date(time * 1000).toISOString()));
@@ -77,6 +78,7 @@ const ModalInputs: React.FC<Props> = ({
         <MentionableInput
           value={message}
           onChange={onMessageChange}
+          guildId={guildId}
         />
         <Box sx={{
           display: 'flex',
@@ -173,8 +175,12 @@ const ModalInputs: React.FC<Props> = ({
             ),
           }}
         />
-        {selectedGuildId && (
-          <ChannelInput channelId={channelId} setChannelId={setChannelId} />
+        {guildId && (
+          <ChannelInput
+            channelId={channelId}
+            setChannelId={setChannelId}
+            guildId={guildId}
+          />
         )}
       </Box>
     </LocalizationProvider>

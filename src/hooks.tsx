@@ -4,8 +4,8 @@ import { io, Socket } from 'socket.io-client';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
-import type { Guild, Channel, SetState } from 'types';
-import { convertDiscordMentionsToReactMentions, getChannelLabel, parseDiscordMentions } from 'utils';
+import type { Guild, Channel, Member, Role, SetState } from 'types';
+import { convertDiscordMentionsToReactMentions, fetchApi, getChannelLabel, parseDiscordMentions } from 'utils';
 import ConfirmModal from 'modals/Confirm';
 import { BaseModalProps } from 'modals/Base';
 
@@ -16,10 +16,139 @@ export function useGetGuild(): (guildId: string | null | undefined) => Guild | n
   };
 }
 
-export function useGuild(): Guild | null | undefined {
+export function useGuild(guildId?: string | null): Guild | null | undefined {
   const { selectedGuildId } = useContext(GuildContext);
+  if (guildId === undefined) guildId = selectedGuildId;
   const getGuild = useGetGuild();
-  return getGuild(selectedGuildId);
+  return getGuild(guildId);
+}
+
+export function useMembers(guildId: string | null | undefined): Member[] | undefined {
+  const { user } = useContext(AuthContext);
+  const [members, setMembers] = useState<Member[] | undefined>();
+  useEffect(() => {
+    if (!user) return () => {};
+    if (!guildId) {
+      setMembers([]);
+      return () => {};
+    }
+    setMembers(undefined);
+    const controller = new AbortController();
+    fetchApi<Member[]>({
+      path: `/guilds/${guildId}/members`,
+      signal: controller.signal,
+    }).then(res => {
+      setMembers(res);
+    });
+    return () => controller.abort();
+  }, [guildId, user]);
+
+  return members;
+}
+
+export function useRoles(guildId: string | null | undefined): Role[] | undefined {
+  const { user } = useContext(AuthContext);
+  const [roles, setRoles] = useState<Role[] | undefined>();
+  useEffect(() => {
+    if (!user) return () => {};
+    if (!guildId) {
+      setRoles([]);
+      return () => {};
+    }
+    setRoles(undefined);
+    const controller = new AbortController();
+    fetchApi<Role[]>({
+      path: `/guilds/${guildId}/roles`,
+      signal: controller.signal,
+    }).then(res => {
+      setRoles(res);
+    });
+    return () => controller.abort();
+  }, [guildId, user]);
+
+  return roles;
+}
+
+export function useChannels(guildId: string | null | undefined): Channel[] | undefined {
+  const { user } = useContext(AuthContext);
+  const [channels, setChannels] = useState<Channel[] | undefined>();
+  useEffect(() => {
+    if (!user) return () => {};
+    if (!guildId) {
+      setChannels([]);
+      return () => {};
+    }
+    setChannels(undefined);
+    const controller = new AbortController();
+    fetchApi<Channel[]>({
+      path: `/guilds/${guildId}/channels`,
+      signal: controller.signal,
+    }).then(res => {
+      setChannels(res);
+    });
+    return () => controller.abort();
+  }, [guildId, user]);
+
+  return channels;
+}
+
+interface UseGuildDataReturn {
+  members: Member[] | undefined,
+  roles: Role[] | undefined,
+  channels: Channel[] | undefined,
+}
+export function useGuildData(guildId: string | null | undefined): UseGuildDataReturn {
+  const members = useMembers(guildId);
+  const roles = useRoles(guildId);
+  const channels = useChannels(guildId);
+  return {
+    members,
+    channels,
+    roles,
+  };
+}
+
+interface UseGuildStateReturn {
+  id: string | null,
+  onChange: (newGuildId: string | null) => void,
+  members: Member[] | undefined,
+  roles: Role[] | undefined,
+  channels: Channel[] | undefined,
+}
+export function useGuildState({
+  fetchGuildData,
+}: {
+  fetchGuildData?: boolean,
+}): UseGuildStateReturn {
+  const {
+    selectedGuildId: globalGuildId,
+    members: globalMembers,
+    channels: globalChannels,
+    roles: globalRoles,
+  } = useContext(GuildContext);
+  const [id, setId] = useState(globalGuildId);
+  const shouldFetchGuildData = fetchGuildData && id !== globalGuildId;
+  const {
+    members,
+    roles,
+    channels,
+  } = useGuildData(shouldFetchGuildData ? id : null);
+
+  useEffect(() => {
+    setId(globalGuildId);
+  }, [globalGuildId]);
+
+  const onChange = useCallback((newGuildId: string | null) => {
+    setId(newGuildId);
+  }, []);
+
+  return {
+    id,
+    onChange,
+    members: shouldFetchGuildData ? members : globalMembers,
+    roles: shouldFetchGuildData ? roles : globalRoles,
+    channels: shouldFetchGuildData ? channels : globalChannels,
+  };
 }
 
 export function useChannel(channelId: string): Channel | null | undefined {

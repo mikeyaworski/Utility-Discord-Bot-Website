@@ -3,17 +3,22 @@ import { TextField, Autocomplete, InputAdornment, Avatar } from '@mui/material';
 import { GuildContext } from 'contexts/guild';
 import type { Option } from 'types';
 import MemberOption from 'components/MemberOption';
+import { useMembers } from 'hooks';
 
 interface Props {
   memberId: string | null,
   setMemberId: (newMemberId: string) => void,
+  guildId?: string | null,
 }
 
 const MemberInput: React.FC<Props> = ({
   memberId,
   setMemberId,
+  guildId,
 }) => {
-  const { members } = useContext(GuildContext);
+  const { members: globalMembers } = useContext(GuildContext);
+  const localMembers = useMembers(guildId);
+  const members = guildId ? localMembers : globalMembers;
 
   const memberOptions: Option[] = members?.map(member => ({
     label: member.name,

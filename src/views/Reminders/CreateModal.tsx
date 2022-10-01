@@ -1,7 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { ReminderModel } from 'types';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { useGuildState } from 'hooks';
+import GuildSelector from 'components/GuildSelector';
 import { GuildContext } from 'contexts/guild';
 import { AuthContext } from 'contexts/auth';
 import { convertReactMentionsToDiscordMentions } from 'utils';
@@ -19,8 +21,14 @@ const CreateReminderModal: React.FC<Props> = ({
   onConfirm,
   ...baseModalProps
 }) => {
-  const { selectedGuildId } = useContext(GuildContext);
   const { botDmChannelId } = useContext(AuthContext);
+
+  const {
+    id: guildId,
+    onChange: onGuildChange,
+  } = useGuildState({
+    fetchGuildData: false,
+  });
 
   const [message, setMessage] = useState<string>('');
   const [times, setTimes] = useState<number[]>([]);
@@ -28,9 +36,14 @@ const CreateReminderModal: React.FC<Props> = ({
   const [endTime, setEndTime] = useState<number | null>(null);
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(null);
   const [channelId, setChannelId] = useState<string | null>(() => {
-    if (!selectedGuildId && botDmChannelId) return botDmChannelId;
+    if (!guildId && botDmChannelId) return botDmChannelId;
     return null;
   });
+
+  useEffect(() => {
+    if (!guildId && botDmChannelId) setChannelId(botDmChannelId);
+    else setChannelId(null);
+  }, [guildId, botDmChannelId]);
 
   const canConfirm = Boolean(times[0]) && Boolean(channelId);
 
@@ -56,6 +69,8 @@ const CreateReminderModal: React.FC<Props> = ({
       disableBackdropDismissal
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Create Reminder</Typography>
+      <GuildSelector dense={false} guildId={guildId} onChange={onGuildChange} />
+      <Box mb={2} />
       <ModalInputs
         message={message}
         onMessageChange={setMessage}
@@ -69,6 +84,7 @@ const CreateReminderModal: React.FC<Props> = ({
         onMaxOccurrencesChange={setMaxOccurrences}
         channelId={channelId}
         setChannelId={setChannelId}
+        guildId={guildId}
       />
     </BaseModal>
   );

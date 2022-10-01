@@ -8,16 +8,24 @@ import type { Option } from 'types';
 
 const avatarSize = 24;
 
-interface Props {
+type Props = {
   dense: boolean,
+  guildId?: undefined,
+  onChange?: undefined,
+} | {
+  dense: boolean,
+  guildId: string | null,
+  onChange: (newGuildId: string | null) => void,
 }
 
 const GuildSelector: React.FC<Props> = ({
   dense,
+  guildId,
+  onChange,
 }) => {
   const { selectGuild } = useContext(GuildContext);
   const { user, notLoggedIn } = useContext(AuthContext);
-  const guild = useGuild();
+  const guild = useGuild(guildId);
   const getGuild = useGetGuild();
 
   const options: Option[] = user?.guilds.map(guild => ({
@@ -88,7 +96,11 @@ const GuildSelector: React.FC<Props> = ({
             }}
           />
         )}
-        onChange={(event, newValue) => selectGuild(newValue ? newValue.value : null)}
+        onChange={(event, newValue) => {
+          const newGuildId = newValue ? newValue.value : null;
+          if (onChange) onChange(newGuildId);
+          else selectGuild(newGuildId);
+        }}
         value={{
           label: guild?.name || (notLoggedIn ? '' : !user ? 'Loading...' : 'Bot DMs'),
           value: guild?.id || '',

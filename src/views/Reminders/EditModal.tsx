@@ -87,6 +87,7 @@ const EditReminderModal: React.FC<Props> = ({
         onMaxOccurrencesChange={setMaxOccurrences}
         channelId={channelId}
         setChannelId={setChannelId}
+        guildId={reminder.model.guild_id}
       />
     </BaseModal>
   );
