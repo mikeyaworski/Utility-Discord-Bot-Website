@@ -12,7 +12,7 @@ export async function fetchApi<T = unknown>({
   path: string,
   queryParams?: [string, string][],
 }): Promise<T> {
-  const url = new URL(`${process.env.REACT_APP_API_ROOT}${path}`);
+  const url = new URL(`${import.meta.env.VITE_API_ROOT}${path}`);
   queryParams.forEach(([key, value]) => {
     url.searchParams.append(key, value);
   });

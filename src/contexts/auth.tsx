@@ -37,8 +37,8 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
         path: '/auth/me',
       });
       if (res) {
-        const ignoredGuilds: Set<string> = process.env.REACT_APP_IGNORED_GUILD_IDS
-          ? new Set<string>(Array.from(process.env.REACT_APP_IGNORED_GUILD_IDS.split(/,\s*/)))
+        const ignoredGuilds: Set<string> = import.meta.env.VITE_IGNORED_GUILD_IDS
+          ? new Set<string>(Array.from(import.meta.env.VITE_IGNORED_GUILD_IDS.split(/,\s*/)))
           : new Set<string>();
         const guilds = res.guilds.filter(g => !ignoredGuilds.has(g.id));
         setUser({

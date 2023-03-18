@@ -190,7 +190,7 @@ export function useSocket(): Socket | undefined {
   const [socket, setSocket] = useState<Socket>();
   useEffect(() => {
     if (!user) return () => {};
-    const newSocket = io(process.env.REACT_APP_API_ROOT!, {
+    const newSocket = io(import.meta.env.VITE_API_ROOT!, {
       withCredentials: true,
     });
     setSocket(newSocket);
@@ -320,7 +320,7 @@ export function useLogInLink(): string {
     oauthState,
   };
   return `https://discord.com/api/oauth2/authorize?client_id=${
-    process.env.REACT_APP_DISCORD_BOT_CLIENT_ID
+    import.meta.env.VITE_DISCORD_BOT_CLIENT_ID
   }&redirect_uri=${
     window.location.origin
   }&response_type=code&scope=identify%20guilds&state=${
