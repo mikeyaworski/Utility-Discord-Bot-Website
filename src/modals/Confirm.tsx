@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import BaseModal, { BaseModalProps } from './Base';
 
 interface Props extends BaseModalProps {
