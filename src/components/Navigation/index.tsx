@@ -41,12 +41,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
           method: 'POST',
           body: JSON.stringify(data),
         });
-        window.history.pushState(
-          '',
-          document.title,
-          window.location.pathname,
-        );
-        if (redirectPath) navigate(redirectPath);
+        navigate(redirectPath || window.location.pathname);
         const user = await refetchUser();
         if (user) await refetchBotDm();
       } catch (err) {
