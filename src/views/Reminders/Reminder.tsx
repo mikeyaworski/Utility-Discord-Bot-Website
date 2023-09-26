@@ -119,10 +119,6 @@ const ReminderCard: React.FC<Props> = ({
     return () => clearInterval(interval);
   }, [reminder]);
 
-  const timeString = remainingTime > 0
-    ? `${getDateString(reminder.model.time)}\n(${humanizeDuration(remainingTime)})`
-    : getDateString(reminder.model.time);
-
   const parseDiscordMentions = useParseDiscordMentions();
   const messageParts = parseDiscordMentions(reminder.model.message || 'Timer is up!');
 
@@ -165,9 +161,14 @@ const ReminderCard: React.FC<Props> = ({
             </Box>
             <Box sx={{ width: '100%' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Time</Typography>
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-                {timeString}
+              <Typography variant="body2">
+                {getDateString(reminder.model.time)}
               </Typography>
+              {remainingTime > 0 && (
+                <Typography variant="body2">
+                  ({humanizeDuration(remainingTime)})
+                </Typography>
+              )}
             </Box>
             {reminder.model.interval && (
             <Box sx={{ width: '100%' }}>
@@ -182,7 +183,8 @@ const ReminderCard: React.FC<Props> = ({
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>End Time</Typography>
                 <Typography variant="body2">
                   {getDateString(reminder.model.end_time)}
-                  <br />
+                </Typography>
+                <Typography variant="body2">
                   ({humanizeDuration(endTimeRemaining)})
                 </Typography>
               </Box>
