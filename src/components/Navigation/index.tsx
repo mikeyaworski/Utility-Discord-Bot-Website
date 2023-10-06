@@ -20,7 +20,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
   const alert = useAlert();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { validate: validateOauthState } = useOauthState();
+  const { validate: validateOauthState, remove: removeOauthState } = useOauthState();
   const { refetchUser, refetchBotDm } = useContext(AuthContext);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -42,6 +42,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
           body: JSON.stringify(data),
         });
         navigate(redirectPath || window.location.pathname);
+        removeOauthState();
         const user = await refetchUser();
         if (user) await refetchBotDm();
       } catch (err) {
@@ -58,6 +59,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
     refetchBotDm,
     alert,
     validateOauthState,
+    removeOauthState,
     navigate,
   ]);
 
