@@ -94,6 +94,7 @@ rules:
   react/function-component-definition: off # This sucks with TS
   no-nested-ternary: off # This is actually clean
   prefer-destructuring: off # This is often just more messy
+  react/jsx-no-bind: off
 
   # We are not worried about accessibility
   jsx-a11y/media-has-caption: off
