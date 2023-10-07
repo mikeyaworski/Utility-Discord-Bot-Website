@@ -1,24 +1,15 @@
 import React from 'react';
-import { Link } from '@mui/material';
-import Linkify from 'react-linkify';
 import { MessagePart, MessagePartType } from 'types';
 import Mention from 'components/Mention';
+import LinkedText from './LinkedText';
 
 interface Props {
   parts: MessagePart[],
 }
 
-const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
-  return (
-    <Link key={key} href={href} target="_blank">
-      {text}
-    </Link>
-  );
-};
-
 const Message: React.FC<Props> = ({ parts }) => {
   return (
-    <Linkify componentDecorator={linkDecorator}>
+    <LinkedText>
       {parts.map((part, i) => (
         // eslint-disable-next-line react/no-array-index-key
         <React.Fragment key={i}>
@@ -29,7 +20,7 @@ const Message: React.FC<Props> = ({ parts }) => {
             )}
         </React.Fragment>
       ))}
-    </Linkify>
+    </LinkedText>
   );
 };
 
