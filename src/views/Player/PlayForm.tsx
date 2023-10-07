@@ -110,94 +110,100 @@ const PlayForm: React.FC<Props> = ({ playerStatus }) => {
   return (
     <Box>
       <Typography variant="h6" mb={2}>Play Audio</Typography>
-      <Tabs
-        selectedTab={selectedTab}
-        setSelectedTab={setSelectedTab}
-        tabsData={[
-          {
-            label: 'Link or Query',
-            body: (
-              <TextField
-                label="Type here"
-                variant="outlined"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                fullWidth
-              />
-            ),
-          },
-          {
-            label: 'Favorite',
-            disabled: favoritesLoading || favorites.length === 0,
-            body: (
-              <FormControl variant="filled" fullWidth>
-                <InputLabel>Select Favorite</InputLabel>
-                <Select
-                  value={selectedFavorite}
-                  onChange={e => setSelectedFavorite(e.target.value)}
-                >
-                  {favorites.map(favorite => (
-                    <MenuItem
-                      value={favorite.custom_id || favorite.id}
-                      key={favorite.custom_id || favorite.id}
-                    >
-                      {favorite.label || favorite.custom_id || favorite.id}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ),
-          },
-          {
-            label: 'Live',
-            disabled: true,
-            body: (
-              <TextField
-                label="Type here"
-                variant="outlined"
-                value={livestreamInput}
-                onChange={e => setLivestreamInput(e.target.value)}
-                fullWidth
-              />
-            ),
-          },
-        ]}
-      />
-      <Box>
-        <FormControlLabel
-          label="Shuffle"
-          control={(
-            <Checkbox
-              checked={shuffle}
-              onChange={e => setShuffle(e.target.checked)}
-            />
-          )}
+      <form onSubmit={e => {
+        e.preventDefault();
+        onConfirm();
+      }}
+      >
+        <Tabs
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          tabsData={[
+            {
+              label: 'Link or Query',
+              body: (
+                <TextField
+                  label="Type here"
+                  variant="outlined"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  fullWidth
+                />
+              ),
+            },
+            {
+              label: 'Favorite',
+              disabled: favoritesLoading || favorites.length === 0,
+              body: (
+                <FormControl variant="filled" fullWidth>
+                  <InputLabel>Select Favorite</InputLabel>
+                  <Select
+                    value={selectedFavorite}
+                    onChange={e => setSelectedFavorite(e.target.value)}
+                  >
+                    {favorites.map(favorite => (
+                      <MenuItem
+                        value={favorite.custom_id || favorite.id}
+                        key={favorite.custom_id || favorite.id}
+                      >
+                        {favorite.label || favorite.custom_id || favorite.id}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ),
+            },
+            {
+              label: 'Live',
+              disabled: true,
+              body: (
+                <TextField
+                  label="Type here"
+                  variant="outlined"
+                  value={livestreamInput}
+                  onChange={e => setLivestreamInput(e.target.value)}
+                  fullWidth
+                />
+              ),
+            },
+          ]}
         />
-      </Box>
-      <Box>
-        <FormControlLabel
-          label="Front of Queue"
-          control={(
-            <Checkbox
-              checked={pushToFront}
-              onChange={e => setPushToFront(e.target.checked)}
-            />
-          )}
-        />
-      </Box>
-      <Box display="flex" justifyContent="flex-end" gap={2}>
-        <Button
-          color="primary"
-          startIcon={submitting && (
-            <CircularProgress size={14} color="inherit" />
-          )}
-          onClick={onConfirm}
-          disabled={submitting}
-          variant="contained"
-        >
-          {playerStatus?.currentTrack ? 'Add to Queue' : 'Play'}
-        </Button>
-      </Box>
+        <Box>
+          <FormControlLabel
+            label="Shuffle"
+            control={(
+              <Checkbox
+                checked={shuffle}
+                onChange={e => setShuffle(e.target.checked)}
+              />
+            )}
+          />
+        </Box>
+        <Box>
+          <FormControlLabel
+            label="Front of Queue"
+            control={(
+              <Checkbox
+                checked={pushToFront}
+                onChange={e => setPushToFront(e.target.checked)}
+              />
+            )}
+          />
+        </Box>
+        <Box display="flex" justifyContent="flex-end" gap={2}>
+          <Button
+            color="primary"
+            startIcon={submitting && (
+              <CircularProgress size={14} color="inherit" />
+            )}
+            type="submit"
+            disabled={submitting}
+            variant="contained"
+          >
+            {playerStatus?.currentTrack ? 'Add to Queue' : 'Play'}
+          </Button>
+        </Box>
+      </form>
     </Box>
   );
 };
