@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Box, Modal, Divider } from '@mui/material';
+import { Button, Box, Modal, Divider, CircularProgress } from '@mui/material';
 
 interface Props {
   open: boolean,
@@ -57,7 +57,9 @@ const BaseModal: React.FC<Props> = ({
           </Button>
           <Button
             color={confirmColor}
-            startIcon={confirmIcon}
+            startIcon={confirmIcon || (busy && (
+              <CircularProgress size={14} color="inherit" />
+            ))}
             onClick={onConfirm}
             disabled={busy || !canConfirm}
             variant="contained"
