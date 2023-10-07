@@ -108,3 +108,60 @@ export interface MessagePart {
   type: MessagePartType,
   value: string,
 }
+
+export enum TrackVariant {
+  YOUTUBE_VOD,
+  YOUTUBE_LIVESTREAM,
+  TWITCH_VOD,
+  TWITCH_LIVESTREAM,
+}
+
+export interface CurrentTrackPlayTime {
+  // all in MS
+  started: number | null, // timestamp
+  pauseStarted: number | null, // timestamp
+  totalPauseTime: number,
+  seeked: number | null,
+  speed: number,
+}
+
+export interface Track {
+  id: string,
+  link: string,
+  sourceLink: string | undefined,
+  variant: TrackVariant,
+  title: string,
+  duration?: number,
+}
+
+export interface PlayerStatus {
+  currentTime: CurrentTrackPlayTime,
+  playbackSpeed: number,
+  isLooped: boolean,
+  isShuffled: boolean,
+  isPaused: boolean,
+  currentTrack: Track | null,
+  queue: Track[],
+  totalQueueSize: number,
+}
+
+export interface PlayInputs {
+  vodLink?: string | null,
+  favoriteId?: string | null,
+  streamLink?: string | null,
+  queryStr?: string | null,
+  pushToFront?: boolean,
+  shuffle?: boolean,
+}
+
+export interface Favorite {
+  id: number,
+  guild_id: string,
+  user_id: string,
+  custom_id: string | null,
+  label: string | null,
+  variant: 'LINK',
+  value: string,
+  createdAt: string,
+  updatedAt: string,
+}

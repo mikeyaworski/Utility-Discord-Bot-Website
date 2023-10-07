@@ -19,6 +19,7 @@ import {
   ChevronRight as ChevronRightIcon,
   Home as HomeIcon,
   Assignment as RemindersIcon,
+  NotStarted as NotStartedIcon,
 } from '@mui/icons-material';
 import type { SetState } from 'types';
 
@@ -40,6 +41,11 @@ export const routes: readonly Route[] = Object.freeze([
     icon: <RemindersIcon color="inherit" />,
     label: 'Reminders',
     path: '/reminders',
+  }),
+  Object.freeze({
+    icon: <NotStartedIcon color="inherit" />,
+    label: 'Player',
+    path: '/player',
   }),
   Object.freeze({
     icon: <FontAwesomeIcon icon={faChessBoard} style={{ width: 22, height: 22, padding: 2 }} color="inherit" />,

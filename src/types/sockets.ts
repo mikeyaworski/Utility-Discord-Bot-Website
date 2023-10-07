@@ -1,4 +1,4 @@
-import { Reminder, ChessGame } from 'types';
+import { Reminder, ChessGame, PlayerStatus } from 'types';
 
 export enum SocketEventTypes {
   REMINDER_CREATED = 'REMINDER_CREATED',
@@ -9,6 +9,8 @@ export enum SocketEventTypes {
   CHESS_CHALLENGE_DECLINED = 'CHESS_CHALLENGE_DECLINED',
   CHESS_GAME_UPDATED = 'CHESS_GAME_UPDATED',
   CHESS_GAME_RESIGNED = 'CHESS_GAME_RESIGNED',
+  PLAYER_STATUS_CHANGED = 'PLAYER_STATUS_CHANGED',
+  PLAYER_DISCONNECTED = 'PLAYER_DISCONNECTED',
 }
 
 export interface ChessGameIdData {
@@ -17,6 +19,18 @@ export interface ChessGameIdData {
 
 export interface ChessGameForfeitData extends ChessGameIdData {
   resigner: string,
+}
+
+export interface PlayerStatusData extends PlayerStatus {
+  guildId: string,
+  channel: {
+    name: string,
+  }
+}
+
+export interface PlayerDisconnectedData {
+  guildId: string,
+  channelId?: string,
 }
 
 export type SocketEvent =
@@ -58,4 +72,13 @@ export type SocketEvent =
 {
   type: SocketEventTypes.CHESS_GAME_RESIGNED,
   data: ChessGameForfeitData,
+}
+|
+{
+  type: SocketEventTypes.PLAYER_STATUS_CHANGED,
+  data: PlayerStatusData,
+}|
+{
+  type: SocketEventTypes.PLAYER_DISCONNECTED,
+  data: PlayerDisconnectedData,
 }

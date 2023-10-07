@@ -6,6 +6,7 @@ import { AuthContext } from 'contexts/auth';
 import LogIn from 'views/LogIn';
 import Home from 'views/Home';
 import Reminders from 'views/Reminders';
+import Player from 'views/Player';
 import Chess from 'views/Chess';
 
 const AppRouter: React.FC = () => {
@@ -31,6 +32,7 @@ const AppRouter: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/reminders" element={<Reminders />} />
+          <Route path="/player" element={<Player />} />
           <Route path="/chess" element={<Chess />} />
         </Routes>
       </Navigation>

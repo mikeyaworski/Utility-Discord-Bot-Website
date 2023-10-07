@@ -4,7 +4,7 @@ import { IntentionalAny } from 'types';
 
 type AlertFn = (message: string) => void;
 
-interface AlertContextType {
+export interface AlertContextType {
   success: AlertFn;
   error: AlertFn;
   warning: AlertFn;

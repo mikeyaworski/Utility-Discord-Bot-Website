@@ -252,3 +252,40 @@ export function parseTimeInput(input: string): number {
   }
   return Math.floor(date.getTime() / 1000);
 }
+
+export function getClockString(durationMs: number, minPortionLength = 0): string {
+  const secondsInMs = 1000;
+  const minutesInMs = 60 * secondsInMs;
+  const hoursInMs = 60 * minutesInMs;
+  const numHours = Math.floor(durationMs / hoursInMs);
+  durationMs -= numHours * hoursInMs;
+  const numMins = Math.floor(durationMs / minutesInMs);
+  durationMs -= numMins * minutesInMs;
+  const numSecs = Math.floor(durationMs / secondsInMs);
+  return [numHours, numMins, numSecs].reduce((acc, portion, i, portions) => {
+    const isRequired = (portions.length - minPortionLength) <= i;
+    if (!acc && !portion && !isRequired) return '';
+    const formatted = String(portion).padStart(2, '0');
+    if (acc) return `${acc}:${formatted}`;
+    return formatted;
+  }, '') || '0';
+}
+
+export async function getErrorMsg(err: unknown): Promise<string> {
+  if (err && typeof err === 'object' && 'text' in err && typeof err.text === 'function') {
+    return err.text();
+  }
+  if (err && typeof err === 'object' && 'message' in err && err.message) {
+    return String(err.message);
+  }
+  return 'Something went wrong.';
+}
+
+export function isValidHttpUrl(maybeUrl: string): boolean {
+  try {
+    const url = new URL(maybeUrl);
+    return /https?:/.test(url.protocol);
+  } catch (_) {
+    return false;
+  }
+}
