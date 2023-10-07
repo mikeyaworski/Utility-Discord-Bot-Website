@@ -104,10 +104,10 @@ const Player: React.FC = () => {
     >
       <Box flexShrink={0}>
         <Box display="flex" justifyContent="space-between" gap={4} maxWidth={800} flexWrap="wrap">
-          <Box>
+          <Box maxWidth={380}>
             <NowPlaying playerStatus={playerStatus} setPlayerStatus={setPlayerStatus} />
           </Box>
-          <Box>
+          <Box width={340}>
             <PlayForm playerStatus={playerStatus} />
           </Box>
         </Box>
