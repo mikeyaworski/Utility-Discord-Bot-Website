@@ -1,17 +1,30 @@
 import React, { useContext, useState, useEffect } from 'react';
-import BaseModal, { BaseModalProps } from 'modals/Base';
 import { Favorite, PlayInputs } from 'types';
-import { Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Tabs from 'components/Tabs';
 import { GuildContext } from 'contexts/guild';
 import { fetchApi, getErrorMsg, isValidHttpUrl } from 'utils';
 import { error } from 'logging';
 import { useAlert } from 'alerts';
+import { PlayerStatusData } from 'types/sockets';
 
-const PlayModal: React.FC<BaseModalProps> = ({
-  onClose,
-  ...baseModalProps
-}) => {
+interface Props {
+  playerStatus: PlayerStatusData | null,
+}
+
+const PlayForm: React.FC<Props> = ({ playerStatus }) => {
   const { selectedGuildId } = useContext(GuildContext);
   const alert = useAlert();
 
@@ -38,6 +51,13 @@ const PlayModal: React.FC<BaseModalProps> = ({
       setFavoritesLoading(false);
     });
   }, [selectedGuildId]);
+
+  function resetInputs() {
+    setInput('');
+    setShuffle(false);
+    setPushToFront(false);
+    setSelectedFavorite('');
+  }
 
   async function onConfirm() {
     const data: Partial<PlayInputs> = {
@@ -78,7 +98,8 @@ const PlayModal: React.FC<BaseModalProps> = ({
           body: JSON.stringify(data),
         });
         setSubmitting(false);
-        onClose();
+        resetInputs();
+        alert.success(playerStatus?.currentTrack ? 'Success! Track(s) are being queued.' : 'Success! Track will play momentarily.');
       } catch (err) {
         setSubmitting(false);
         alert.error(await getErrorMsg(err));
@@ -87,15 +108,8 @@ const PlayModal: React.FC<BaseModalProps> = ({
   }
 
   return (
-    <BaseModal
-      {...baseModalProps}
-      onConfirm={onConfirm}
-      onClose={onClose}
-      busy={submitting}
-      confirmText="Play"
-      disableBackdropDismissal
-    >
-      <Typography variant="h5" sx={{ mb: 2 }}>Play Audio</Typography>
+    <Box>
+      <Typography variant="h6" mb={2}>Play Audio</Typography>
       <Tabs
         selectedTab={selectedTab}
         setSelectedTab={setSelectedTab}
@@ -171,8 +185,21 @@ const PlayModal: React.FC<BaseModalProps> = ({
           )}
         />
       </Box>
-    </BaseModal>
+      <Box display="flex" justifyContent="flex-end" gap={2}>
+        <Button
+          color="primary"
+          startIcon={submitting && (
+            <CircularProgress size={14} color="inherit" />
+          )}
+          onClick={onConfirm}
+          disabled={submitting}
+          variant="contained"
+        >
+          {playerStatus?.currentTrack ? 'Add to Queue' : 'Play'}
+        </Button>
+      </Box>
+    </Box>
   );
 };
 
-export default PlayModal;
+export default PlayForm;

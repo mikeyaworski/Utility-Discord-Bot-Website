@@ -4,15 +4,14 @@ import { PlayerDisconnectedData, PlayerStatusData, SocketEventTypes } from 'type
 import { GuildContext } from 'contexts/guild';
 import { fetchApi } from 'utils';
 import { error } from 'logging';
-import { Box, Button, CircularProgress, Fab, Tooltip, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Tooltip, Typography } from '@mui/material';
 import {
-  Add as AddIcon,
   Info as InfoIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import NowPlaying from './NowPlaying';
 import Queue from './Queue';
-import PlayModal from './PlayModal';
+import PlayForm from './PlayForm';
 import { useTryUpdate } from './utils';
 
 const Player: React.FC = () => {
@@ -73,26 +72,6 @@ const Player: React.FC = () => {
     });
   }
 
-  // TODO: Add ability to create, edit and delete favorites as well
-  const fab = (
-    <Fab
-      color="primary"
-      sx={{ position: 'fixed', right: 40, bottom: 40 }}
-      onClick={() => setPlayModalOpen(true)}
-      title="Play something"
-    >
-      <AddIcon />
-    </Fab>
-  );
-
-  const playModal = playModalOpen && (
-    <PlayModal
-      open
-      onConfirm={() => Promise.resolve()}
-      onClose={() => setPlayModalOpen(false)}
-    />
-  );
-
   if (loading) {
     return (
       <CircularProgress />
@@ -110,13 +89,9 @@ const Player: React.FC = () => {
   // TODO: Only show the play button if they're connected to a voice channel (need to keep this updated with sockets, so do it later)
   if (!playerStatus || (!playerStatus.currentTrack && playerStatus.queue.length === 0)) {
     return (
-      <>
-        <Button variant="contained" onClick={() => setPlayModalOpen(true)}>
-          Play something!
-        </Button>
-        {fab}
-        {playModal}
-      </>
+      <Box width={350}>
+        <PlayForm playerStatus={playerStatus} />
+      </Box>
     );
   }
 
@@ -128,7 +103,14 @@ const Player: React.FC = () => {
       flexDirection="column"
     >
       <Box flexShrink={0}>
-        <NowPlaying playerStatus={playerStatus} setPlayerStatus={setPlayerStatus} />
+        <Box display="flex" justifyContent="space-between" gap={4} maxWidth={800} flexWrap="wrap">
+          <Box>
+            <NowPlaying playerStatus={playerStatus} setPlayerStatus={setPlayerStatus} />
+          </Box>
+          <Box>
+            <PlayForm playerStatus={playerStatus} />
+          </Box>
+        </Box>
         {playerStatus.queue.length > 0 && (
           <Box display="flex" alignItems="center" gap={1} mt={3} mb={1} maxWidth={800} pr={1}>
             <Typography variant="h6">
@@ -174,9 +156,7 @@ const Player: React.FC = () => {
           />
         </Box>
       )}
-      {fab}
       {confirmClearQueueModal}
-      {playModal}
     </Box>
   );
 };
