@@ -7,8 +7,8 @@ export function getTrackDurationStrings(
   currentTime: number,
   duration: number,
 ): [string, string] {
-  const totalDuration = getClockString(duration);
-  const minPortions = (totalDuration.match(/:/g) || []).length + 1;
+  const totalDuration = getClockString(duration, 2);
+  const minPortions = Math.max(2, (totalDuration.match(/:/g) || []).length + 1);
   return [getClockString(currentTime, minPortions), totalDuration];
 }
 
