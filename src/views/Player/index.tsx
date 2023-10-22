@@ -114,9 +114,9 @@ const Player: React.FC = () => {
         {playerStatus.queue.length > 0 && (
           <Box display="flex" alignItems="center" gap={1} mt={3} mb={1} maxWidth={800} pr={1}>
             <Typography variant="h6">
-              Queue ({playerStatus.queue.length})
+              Queue ({playerStatus.totalQueueSize})
             </Typography>
-            <Tooltip title="Only the first 20 items in the queue are shown.">
+            <Tooltip title="Only the first 10 items in the queue are shown.">
               <InfoIcon fontSize="small" sx={{ cursor: 'pointer' }} />
             </Tooltip>
             <Button
