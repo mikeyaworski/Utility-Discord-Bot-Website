@@ -157,7 +157,7 @@ const ModalInputs: React.FC<Props> = ({
         />
         <TextField
           value={maxOccurrences || ''}
-          onChange={e => onMaxOccurrencesChange(Number(e.target.value))}
+          onChange={e => onMaxOccurrencesChange(Number(e.target.value) || null)}
           label="Max Occurrences"
           inputProps={{
             inputMode: 'numeric',
