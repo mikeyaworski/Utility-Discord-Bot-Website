@@ -72,6 +72,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
         display="flex"
         flexDirection="column"
         height="100vh"
+        width="100vw"
         flexGrow={1}
       >
         <DrawerHeader />
