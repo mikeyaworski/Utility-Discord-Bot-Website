@@ -230,7 +230,7 @@ export function useSet<T = unknown>(initialData?: T[]): UseSetReturn<T> {
 interface OpenOptions {
   title?: string,
   details?: string,
-  onConfirm: () => Promise<void>,
+  onConfirm: () => Promise<void> | void,
 }
 interface UseConfirmationModalReturn {
   node: React.ReactNode,
