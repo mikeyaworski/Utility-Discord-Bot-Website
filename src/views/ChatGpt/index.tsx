@@ -110,6 +110,7 @@ const ChatGpt: React.FC = () => {
               key={message.role + message.content + i}
               sx={{
                 alignSelf: message.role === 'assistant' ? 'flex-start' : 'flex-end',
+                maxWidth: '95%',
                 // multiline
                 height: 'auto',
                 '& .MuiChip-label': {
