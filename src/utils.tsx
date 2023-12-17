@@ -30,7 +30,8 @@ export async function fetchApi<T = unknown>({
     const data = await res.json();
     return data as T;
   }
-  return null as unknown as T;
+  const data = await res.text();
+  return data as T;
 }
 
 export function getGuildIcon(guild: Guild): string {
