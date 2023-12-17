@@ -19,7 +19,6 @@ const Player: React.FC = () => {
   const [playerStatus, setPlayerStatus] = useState<PlayerStatusData | null>(null);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [playModalOpen, setPlayModalOpen] = useState(false);
 
   const { node: confirmClearQueueModal, open: openConfirmClearQueueModal } = useConfirmationModal({
     confirmText: 'Clear',
