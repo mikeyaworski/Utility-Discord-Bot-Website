@@ -20,6 +20,7 @@ import {
   Home as HomeIcon,
   Assignment as RemindersIcon,
   NotStarted as NotStartedIcon,
+  Chat as ChatIcon,
 } from '@mui/icons-material';
 import type { SetState } from 'types';
 
@@ -46,6 +47,11 @@ export const routes: readonly Route[] = Object.freeze([
     icon: <NotStartedIcon color="inherit" />,
     label: 'Player',
     path: '/player',
+  }),
+  Object.freeze({
+    icon: <ChatIcon color="inherit" />,
+    label: 'ChatGPT',
+    path: '/chatgpt',
   }),
   Object.freeze({
     icon: <FontAwesomeIcon icon={faChessBoard} style={{ width: 22, height: 22, padding: 2 }} color="inherit" />,

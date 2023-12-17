@@ -165,3 +165,8 @@ export interface Favorite {
   createdAt: string,
   updatedAt: string,
 }
+
+export interface ChatGptConversationMessage {
+  role: 'user' | 'assistant',
+  content: string,
+}
