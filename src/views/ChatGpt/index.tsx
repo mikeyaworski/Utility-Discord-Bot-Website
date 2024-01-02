@@ -143,6 +143,7 @@ const ChatGpt: React.FC = () => {
             onChange={e => setInput(e.target.value)}
             name="message"
             placeholder="Type your message..."
+            autoFocus
           />
         </form>
       </Box>
