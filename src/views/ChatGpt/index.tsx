@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import get from 'lodash.get';
 import { Box, Button, Chip, TextField, Typography } from '@mui/material';
 import { Delete as TrashIcon } from '@mui/icons-material';
 import { ChatGptConversationMessage } from 'types';
+import { useAlert } from 'alerts';
 import { useConfirmationModal } from 'hooks';
 import { fetchApi } from 'utils';
 import DotPulse from './DotPulse';
@@ -10,6 +12,7 @@ const conversationStateKey = 'chatGptConversation';
 const conversationStorageLimit = 100;
 
 const ChatGpt: React.FC = () => {
+  const alert = useAlert();
   const [conversation, setConversation] = useState<ChatGptConversationMessage[]>(() => JSON.parse(
     window.localStorage.getItem(conversationStateKey) || '[]',
   ));
@@ -30,15 +33,21 @@ const ChatGpt: React.FC = () => {
     setBusy(true);
     setInput('');
     setConversation(old => [{ role: 'user', content: message }, ...old]);
-    const chatGptResponse = await fetchApi<string>({
-      method: 'POST',
-      path: '/chatgpt/message',
-      body: JSON.stringify({
-        query: message,
-        conversation,
-      }),
-    });
-    setConversation(old => [{ role: 'assistant', content: chatGptResponse }, ...old]);
+    try {
+      const chatGptResponse = await fetchApi<string>({
+        method: 'POST',
+        path: '/chatgpt/message',
+        body: JSON.stringify({
+          query: message,
+          conversation,
+        }),
+      });
+      setConversation(old => [{ role: 'assistant', content: chatGptResponse }, ...old]);
+    } catch (err) {
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      setInput(message);
+      setConversation(old => old.slice(1));
+    }
     setBusy(false);
   }
 
