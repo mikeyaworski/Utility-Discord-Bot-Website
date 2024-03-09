@@ -5,7 +5,7 @@ import { Delete as TrashIcon } from '@mui/icons-material';
 import { ChatGptConversationMessage } from 'types';
 import { useAlert } from 'alerts';
 import { useConfirmationModal } from 'hooks';
-import { fetchApi } from 'utils';
+import { fetchApi, getErrorMsg } from 'utils';
 import DotPulse from './DotPulse';
 
 const conversationStateKey = 'chatGptConversation';
@@ -44,7 +44,8 @@ const ChatGpt: React.FC = () => {
       });
       setConversation(old => [{ role: 'assistant', content: chatGptResponse }, ...old]);
     } catch (err) {
-      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      const errMsg = await getErrorMsg(err);
+      alert.error(`${get(err, 'status')}: ${errMsg}`);
       setInput(message);
       setConversation(old => old.slice(1));
     }
