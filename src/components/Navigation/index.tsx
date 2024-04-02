@@ -41,7 +41,7 @@ const Navigation: React.FC<Props> = ({ children }) => {
           method: 'POST',
           body: JSON.stringify(data),
         });
-        navigate(redirectPath || window.location.pathname);
+        navigate(redirectPath || window.location.pathname, { replace: true });
         removeOauthState();
         const user = await refetchUser();
         if (user) await refetchBotDm();
