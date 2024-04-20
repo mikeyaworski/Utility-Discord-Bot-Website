@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import get from 'lodash.get';
-import { Box, Button, Chip, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, TextField } from '@mui/material';
 import { Delete as TrashIcon } from '@mui/icons-material';
 import { ChatGptConversationMessage } from 'types';
 import { useAlert } from 'alerts';
 import { useConfirmationModal } from 'hooks';
 import { fetchApi, getErrorMsg } from 'utils';
 import DotPulse from './DotPulse';
+import Message from './Message';
 
 const conversationStateKey = 'chatGptConversation';
 const conversationStorageLimit = 100;
@@ -21,6 +22,11 @@ const ChatGpt: React.FC = () => {
 
   const { node: confirmClearConvoModal, open: openConfirmClearConvoModal } = useConfirmationModal({
     confirmText: 'Clear',
+    confirmColor: 'error',
+  });
+
+  const { node: confirmDeleteMessageModal, open: openConfirmDeleteMessageModal } = useConfirmationModal({
+    confirmText: 'Delete',
     confirmColor: 'error',
   });
 
@@ -59,6 +65,7 @@ const ChatGpt: React.FC = () => {
   return (
     <>
       {confirmClearConvoModal}
+      {confirmDeleteMessageModal}
       <Box
         height="100%"
         width="100%"
@@ -99,9 +106,7 @@ const ChatGpt: React.FC = () => {
         >
           {busy && (
             <Chip
-              label={(
-                <DotPulse />
-              )}
+              label={<DotPulse />}
               color="default"
               sx={{
                 alignSelf: 'flex-start',
@@ -113,22 +118,14 @@ const ChatGpt: React.FC = () => {
             />
           )}
           {conversation.map((message, i) => (
-            <Chip
-              label={<Typography variant="body1">{message.content}</Typography>}
-              color={message.role === 'assistant' ? 'default' : 'primary'}
+            <Message
               // eslint-disable-next-line react/no-array-index-key
               key={message.role + message.content + i}
-              sx={{
-                alignSelf: message.role === 'assistant' ? 'flex-start' : 'flex-end',
-                maxWidth: '95%',
-                // multiline
-                height: 'auto',
-                '& .MuiChip-label': {
-                  display: 'block',
-                  whiteSpace: 'pre-wrap',
-                  py: '8px',
-                },
-              }}
+              message={message}
+              onDelete={() => openConfirmDeleteMessageModal({
+                title: 'Delete message?',
+                onConfirm: () => setConversation(old => old.slice(0, i).concat(old.slice(i + 1))),
+              })}
             />
           ))}
         </Box>
