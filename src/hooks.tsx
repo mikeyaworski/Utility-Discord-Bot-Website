@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import { useMediaQuery, useTheme } from '@mui/material';
+import { Box, Menu, MenuItem, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { AuthContext } from 'contexts/auth';
 import { GuildContext } from 'contexts/guild';
 import type { Guild, Channel, Member, Role, SetState } from 'types';
@@ -331,4 +331,70 @@ export function useLogInLink(): string {
 export function useQueryParam(key: string): string | null {
   const params = new URLSearchParams(window.location.search);
   return params.get(key);
+}
+
+interface ContextMenuItemConfig {
+  onClick: () => void,
+  label: string,
+  icon?: React.ReactNode,
+}
+
+interface UseContextMenuReturn {
+  menu: React.ReactNode,
+  handleContextMenu: (event: React.MouseEvent) => void,
+  handleClose: () => void,
+}
+
+export function useContextMenu(
+  contextMenuItems: ContextMenuItemConfig[],
+  offset: {
+    x: number,
+    y: number,
+  } = { x: 2, y: -6 },
+): UseContextMenuReturn {
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX + offset.x,
+      mouseY: event.clientY + offset.y,
+    });
+  };
+
+  const handleClose = () => setContextMenu(null);
+
+  const menu = (
+    <Menu
+      open={contextMenu !== null}
+      autoFocus={false}
+      onClose={handleClose}
+      anchorReference="anchorPosition"
+      anchorPosition={
+        contextMenu !== null
+          ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+          : undefined
+      }
+    >
+      {contextMenuItems.map(config => (
+        <MenuItem onClick={config.onClick}>
+          <Box display="flex" flexDirection="row" alignItems="center" gap={0.5}>
+            {config.icon}
+            <Typography variant="body1">
+              {config.label}
+            </Typography>
+          </Box>
+        </MenuItem>
+      ))}
+    </Menu>
+  );
+
+  return {
+    menu,
+    handleClose,
+    handleContextMenu,
+  };
 }
