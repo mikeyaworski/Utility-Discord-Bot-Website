@@ -4,10 +4,10 @@ import { ReminderModel } from 'types';
 import { Box, Typography } from '@mui/material';
 import { useGuildState } from 'hooks';
 import GuildSelector from 'components/GuildSelector';
-import { GuildContext } from 'contexts/guild';
 import { AuthContext } from 'contexts/auth';
 import { convertReactMentionsToDiscordMentions } from 'utils';
 import ModalInputs from './ModalInputs';
+import { getFilteredTimesFromInput } from './utils';
 
 export type Payload = Omit<ReminderModel, 'id' | 'guild_id' | 'owner_id' | 'createdAt' | 'updatedAt'> & {
   message: string | null,
@@ -31,7 +31,7 @@ const CreateReminderModal: React.FC<Props> = ({
   });
 
   const [message, setMessage] = useState<string>('');
-  const [times, setTimes] = useState<number[]>([]);
+  const [times, setTimes] = useState<(number | string)[]>([]);
   const [interval, setInterval] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(null);
@@ -50,7 +50,7 @@ const CreateReminderModal: React.FC<Props> = ({
   function handleConfirm() {
     const formattedMessage = convertReactMentionsToDiscordMentions(message);
     if (times.length > 0 && channelId) {
-      onConfirm(times.filter(Boolean).map(time => ({
+      onConfirm(getFilteredTimesFromInput(times).map(time => ({
         message: formattedMessage || null,
         time,
         interval,

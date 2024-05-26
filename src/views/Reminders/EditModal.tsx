@@ -6,6 +6,7 @@ import { useConvertDiscordMentionsToReactMentions } from 'hooks';
 import { convertReactMentionsToDiscordMentions } from 'utils';
 import ModalInputs from './ModalInputs';
 import type { Payload } from './CreateModal';
+import { getFilteredTimesFromInput } from './utils';
 
 type Props = Omit<BaseModalProps, 'onConfirm'> & {
   reminder: Reminder,
@@ -20,7 +21,7 @@ const EditReminderModal: React.FC<Props> = ({
   const convertDiscordMentionsToReactMentions = useConvertDiscordMentionsToReactMentions();
 
   const [message, setMessage] = useState<string>(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
-  const [times, setTimes] = useState<number[]>([reminder.model.time]);
+  const [times, setTimes] = useState<(number | string)[]>([reminder.model.time]);
   const [interval, setInterval] = useState<number | null>(reminder.model.interval);
   const [endTime, setEndTime] = useState<number | null>(reminder.model.end_time);
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(reminder.model.max_occurrences);
@@ -37,7 +38,7 @@ const EditReminderModal: React.FC<Props> = ({
 
   function handleConfirm() {
     if (times.length === 0) return;
-    const [editedTime, ...newTimes] = times;
+    const [editedTime, ...newTimes] = getFilteredTimesFromInput(times);
     const timeMaybeChanged = reminder.model.time !== editedTime
       || newTimes.length > 0
       || reminder.model.interval !== interval

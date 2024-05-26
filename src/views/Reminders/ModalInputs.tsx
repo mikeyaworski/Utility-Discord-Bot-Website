@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { Box, InputAdornment, TextField, IconButton, Autocomplete, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -7,17 +7,18 @@ import {
   Clear as ClearIcon,
   SwapHoriz as SwapHorizIcon,
 } from '@mui/icons-material';
-import { filterOutFalsy, parseDelay, parseTimeInput } from 'utils';
+import { parseDelay } from 'utils';
 import MentionableInput from 'components/MentionableInput';
 import ChannelInput from 'components/ChannelInput';
+import { getFilteredTimesFromInput } from './utils';
 
 interface Props {
   message: string,
   onMessageChange: (message: string) => void,
   interval: number | null,
   onIntervalChange: (interval: number | null) => void,
-  times: number[],
-  onTimesChange: (times: number[]) => void,
+  times: (number | string)[],
+  onTimesChange: (times: (number | string)[]) => void,
   endTime: number | null,
   onEndTimeChange: (endTime: number | null) => void,
   maxOccurrences: number | null,
@@ -44,28 +45,31 @@ const ModalInputs: React.FC<Props> = ({
 }) => {
   const [intervalInput, setIntervalInput] = useState(interval ? `${interval}s` : '');
   const [showMultiTimeInput, setShowMultiTimeInput] = useState<boolean>(() => localStorage.getItem('showMultiTimeInput') === 'true' || false);
-  const [timesMultiInput, setTimesMultiInput] = useState<string[]>(() => times.map(time => new Date(time * 1000).toISOString()));
-
-  function getTimeFromTimeInput(input: string): number | null {
-    try {
-      return parseTimeInput(input);
-    } catch {
-      return null;
-    }
-  }
+  const [timesMultiInput, setTimesMultiInput] = useState<string[]>(() => {
+    return times.map(time => {
+      if (typeof time === 'string') return time;
+      return new Date(time * 1000).toISOString();
+    });
+  });
 
   const handleTimeSwap = useCallback(() => {
     setShowMultiTimeInput(old => {
       const newShowMulti = !old;
       if (newShowMulti) {
-        onTimesChange(filterOutFalsy(timesMultiInput
-          .map(input => getTimeFromTimeInput(input))));
+        onTimesChange(timesMultiInput);
       } else if (timesMultiInput.length > 0) {
-        onTimesChange(filterOutFalsy([getTimeFromTimeInput(timesMultiInput[0])]));
+        onTimesChange(getFilteredTimesFromInput(timesMultiInput.slice(0, 1)));
       }
       return newShowMulti;
     });
   }, [timesMultiInput, onTimesChange]);
+
+  const hasTimeError = useMemo<boolean>(() => {
+    if (showMultiTimeInput) {
+      return timesMultiInput.length !== getFilteredTimesFromInput(timesMultiInput).length;
+    }
+    return false;
+  }, [showMultiTimeInput, timesMultiInput]);
 
   useEffect(() => {
     localStorage.setItem('showMultiTimeInput', String(showMultiTimeInput));
@@ -101,19 +105,19 @@ const ModalInputs: React.FC<Props> = ({
                   label="Time"
                   variant="outlined"
                   placeholder={'"5 mins" or "Friday at 2pm"'}
-                  error={timesMultiInput.length !== times.length}
+                  error={hasTimeError}
                 />
               )}
               onChange={(event, values) => {
                 setTimesMultiInput(values.flat());
-                onTimesChange(filterOutFalsy(values.flat().map(value => getTimeFromTimeInput(value))));
+                onTimesChange(values.flat());
               }}
               value={timesMultiInput}
             />
           ) : (
             <DateTimePicker
               label="Time"
-              value={times[0] != null ? times[0] * 1000 : null}
+              value={times[0] != null && typeof times[0] === 'number' ? times[0] * 1000 : null}
               onChange={newTime => {
                 if (newTime) {
                   onTimesChange([newTime / 1000]);
