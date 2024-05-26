@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, InputAdornment, TextField, IconButton, Autocomplete, Tooltip } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -9,7 +9,6 @@ import {
 } from '@mui/icons-material';
 import { filterOutFalsy, parseDelay, parseTimeInput } from 'utils';
 import MentionableInput from 'components/MentionableInput';
-import { GuildContext } from 'contexts/guild';
 import ChannelInput from 'components/ChannelInput';
 
 interface Props {
