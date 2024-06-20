@@ -17,6 +17,7 @@ settings:
         - '.tsx'
 extends:
   - airbnb
+  - 'plugin:react/jsx-runtime'
   - 'plugin:@typescript-eslint/recommended'
 parserOptions:
   ecmaFeatures:

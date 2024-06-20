@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   IconButton,
-  CardHeader,
 } from '@mui/material';
 import {
   Delete as DeleteIcon,
@@ -18,7 +17,6 @@ import LinkedText from 'components/LinkedText';
 import { fetchApi, getClockString } from 'utils';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { GuildContext } from 'contexts/guild';
-import { useAlert } from 'alerts';
 import { PlayerStatusData } from 'types/sockets';
 import { useConfirmationModal } from 'hooks';
 import { useTryUpdate } from './utils';
@@ -41,7 +39,6 @@ const QueueItem: React.FC<Props> = ({
   setPlayerStatus,
 }) => {
   const { selectedGuildId } = useContext(GuildContext);
-  const alert = useAlert();
   const { node: confirmRemoveModal, open: openConfirmRemoveModal } = useConfirmationModal({
     confirmColor: 'error',
     confirmText: 'Remove',

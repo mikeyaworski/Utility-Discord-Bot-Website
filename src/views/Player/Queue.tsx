@@ -5,7 +5,6 @@ import { PlayerStatusData } from 'types/sockets';
 import { GuildContext } from 'contexts/guild';
 import { SetState } from 'types';
 import { Box } from '@mui/material';
-import { useAlert } from 'alerts';
 import QueueItem from './QueueItem';
 import { useTryUpdate } from './utils';
 
@@ -26,7 +25,6 @@ function reorder<T = unknown[]>(list: T[], startIndex: number, endIndex: number)
 // TODO: Implement a virtual list that isn't buggy and render the full queue
 const Queue: React.FC<Props> = ({ disabled, setBusy, playerStatus, setPlayerStatus }) => {
   const { selectedGuildId } = useContext(GuildContext);
-  const alert = useAlert();
 
   const tryUpdate = useTryUpdate({ playerStatus, setPlayerStatus, setBusy });
 

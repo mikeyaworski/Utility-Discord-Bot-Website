@@ -3,7 +3,6 @@
  * https://codepen.io/nzbin/pen/GGrXbp
  */
 
-import React from 'react';
 import { makeStyles } from '@mui/styles';
 import { Box, Theme } from '@mui/material';
 
