@@ -1,38 +1,9 @@
 import React, { useContext } from 'react';
 import { MentionsInput, Mention } from 'react-mentions';
-import { Box, Theme, Typography, Avatar } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Box, Typography, Avatar, useTheme } from '@mui/material';
 import { GuildContext } from 'contexts/guild';
 import type { Member, Channel, Role } from 'types';
 import { useGuildData } from 'hooks';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  mentionInput: {
-    width: '100%',
-    '& *': {
-      // No clue why this library insists on setting the z-index in their inline styles
-      zIndex: '2 !important',
-    },
-    '& > div > div': {
-      padding: '19.5px 14px 15.5px 14px',
-    },
-    '& textarea': {
-      padding: '19.5px 14px 15.5px 14px',
-      borderRadius: 4,
-      color: '#FFFFFF',
-      '&:hover': {
-        borderColor: '#FFFFFF',
-      },
-      '&:focus': {
-        borderColor: theme.palette.primary.main,
-        borderWidth: 2,
-        outline: 'unset',
-        outlineOffset: 'unset',
-        padding: '18.5px 13px 15.5px 13px',
-      },
-    },
-  },
-}));
 
 enum MentionType {
   ROLE,
@@ -70,12 +41,12 @@ const MentionableInput: React.FC<Props> = ({
   onChange,
   guildId,
 }) => {
-  const classes = useStyles();
   const {
     members: localMembers,
     roles: localRoles,
     channels: localChannels,
   } = useGuildData(guildId);
+  const theme = useTheme();
   const {
     members: globalMembers,
     roles: globalRoles,
@@ -121,70 +92,99 @@ const MentionableInput: React.FC<Props> = ({
   } as const;
 
   return (
-    <MentionsInput
-      className={classes.mentionInput}
-      value={value}
-      onChange={(event, newValue) => {
-        onChange(newValue);
-      }}
-      placeholder="Message"
+    <Box sx={{
+      '& .mention-input': {
+        width: '100%',
+        '& *': {
+          // No clue why this library insists on setting the z-index in their inline styles
+          zIndex: '2 !important',
+        },
+        '& > div > div': {
+          padding: '19.5px 14px 15.5px 14px',
+        },
+        '& textarea': {
+          padding: '19.5px 14px 15.5px 14px',
+          borderRadius: '4px',
+          color: '#FFFFFF',
+          '&:hover': {
+            borderColor: '#FFFFFF',
+          },
+          '&:focus': {
+            borderColor: theme.palette.primary.main,
+            borderWidth: 2,
+            outline: 'unset',
+            outlineOffset: 'unset',
+            padding: '18.5px 13px 15.5px 13px',
+          },
+        },
+      },
+    }}
     >
-      <Mention
-        trigger="@"
-        data={(search, cb) => {
-          cb(atMentions.filter(mention => {
-            switch (mention.type) {
-              case MentionType.ROLE: {
-                return mention.data.name.toLowerCase().includes(search.toLowerCase());
-              }
-              case MentionType.MEMBER: {
-                return mention.data.name.toLowerCase().includes(search.toLowerCase());
-              }
-              default: {
-                return false;
-              }
-            }
-          }));
+      <MentionsInput
+        className="mention-input"
+        value={value}
+        onChange={(event, newValue) => {
+          onChange(newValue);
         }}
-        renderSuggestion={suggestion => {
-          const mention = suggestion as AtMention;
-          return (
-            <Box sx={optionStyles}>
-              {mention.type === MentionType.MEMBER && mention.data.avatar && (
-                <Avatar
-                  src={mention.data.avatar}
-                  sx={{
-                    borderRadius: '50%',
-                    width: 20,
-                    height: 20,
-                  }}
-                  alt=""
-                />
-              )}
-              <Typography variant="body1">
-                {mention.type !== MentionType.MEMBER || !mention.data.avatar
-                  ? `@${mention.data.name}`
-                  : mention.data.name}
-              </Typography>
-            </Box>
-          );
-        }}
-      />
-      <Mention
-        trigger="#"
-        data={channelMentions}
-        renderSuggestion={suggestion => {
-          const mention = suggestion as ChannelMention;
-          return (
-            <Box sx={optionStyles}>
-              <Typography variant="body1">
-                #{mention.data.name}
-              </Typography>
-            </Box>
-          );
-        }}
-      />
-    </MentionsInput>
+        placeholder="Message"
+      >
+        <Mention
+          trigger="@"
+          data={(search, cb) => {
+            cb(atMentions.filter(mention => {
+              switch (mention.type) {
+                case MentionType.ROLE: {
+                  return mention.data.name.toLowerCase().includes(search.toLowerCase());
+                }
+                case MentionType.MEMBER: {
+                  return mention.data.name.toLowerCase().includes(search.toLowerCase());
+                }
+                default: {
+                  return false;
+                }
+              }
+            }));
+          }}
+          renderSuggestion={suggestion => {
+            const mention = suggestion as AtMention;
+            return (
+              <Box sx={optionStyles}>
+                {mention.type === MentionType.MEMBER && mention.data.avatar && (
+                  <Avatar
+                    src={mention.data.avatar}
+                    sx={{
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                    }}
+                    alt=""
+                  />
+                )}
+                <Typography variant="body1">
+                  {mention.type !== MentionType.MEMBER || !mention.data.avatar
+                    ? `@${mention.data.name}`
+                    : mention.data.name}
+                </Typography>
+              </Box>
+            );
+          }}
+        />
+        <Mention
+          trigger="#"
+          data={channelMentions}
+          renderSuggestion={suggestion => {
+            const mention = suggestion as ChannelMention;
+            return (
+              <Box sx={optionStyles}>
+                <Typography variant="body1">
+                  #{mention.data.name}
+                </Typography>
+              </Box>
+            );
+          }}
+        />
+      </MentionsInput>
+    </Box>
   );
 };
 
