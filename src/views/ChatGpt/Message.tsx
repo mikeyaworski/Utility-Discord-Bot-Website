@@ -73,6 +73,7 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
         )}
         color={message.role === 'assistant' ? 'default' : 'primary'}
         sx={{
+          fontSize: '1rem', // Prevent the Chip styling from shrinking text since this is not a normal Chip
           alignSelf: message.role === 'assistant' ? 'flex-start' : 'flex-end',
           maxWidth: '95%',
           // multiline
