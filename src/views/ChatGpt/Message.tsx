@@ -6,6 +6,7 @@ import { useContextMenu } from 'hooks';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 import 'katex/dist/katex.min.css';
 
 interface Props {
@@ -63,9 +64,10 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
               },
             }}
           >
+            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{preprocessLaTeX(message.content)}
             </Markdown>
           </Box>
-)}
+        )}
         color={message.role === 'assistant' ? 'default' : 'primary'}
         sx={{
           alignSelf: message.role === 'assistant' ? 'flex-start' : 'flex-end',
