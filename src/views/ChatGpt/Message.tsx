@@ -1,18 +1,15 @@
 import React from 'react';
-import { Chip, Box } from '@mui/material';
-import { Delete as TrashIcon } from '@mui/icons-material';
-import type { ChatGptConversationMessage } from 'types';
-import { useContextMenu } from 'hooks';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
+import { Chip, Box } from '@mui/material';
+import { Delete as TrashIcon } from '@mui/icons-material';
+import type { ChatGptConversationMessage } from 'types';
+import { useContextMenu } from 'hooks';
+
 import 'katex/dist/katex.min.css';
 
-interface Props {
-  message: ChatGptConversationMessage,
-  onDelete: () => void,
-}
 // https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
 const preprocessLaTeX = (content: string) => {
   // Replace block-level LaTeX delimiters \[ \] with $$ $$
@@ -27,6 +24,12 @@ const preprocessLaTeX = (content: string) => {
   );
   return inlineProcessedContent;
 };
+
+interface Props {
+  message: ChatGptConversationMessage,
+  onDelete: () => void,
+}
+
 const Message: React.FC<Props> = ({ message, onDelete }) => {
   const { menu, handleContextMenu } = useContextMenu([
     {
