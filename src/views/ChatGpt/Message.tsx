@@ -12,7 +12,20 @@ interface Props {
   message: ChatGptConversationMessage,
   onDelete: () => void,
 }
-
+// https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
+const preprocessLaTeX = (content: string) => {
+  // Replace block-level LaTeX delimiters \[ \] with $$ $$
+  const blockProcessedContent = content.replace(
+    /\\\[(.*?)\\\]/gs,
+    (_, equation) => `$$${equation}$$`,
+  );
+  // Replace inline LaTeX delimiters \( \) with $ $
+  const inlineProcessedContent = blockProcessedContent.replace(
+    /\\\((.*?)\\\)/gs,
+    (_, equation) => `$${equation}$`,
+  );
+  return inlineProcessedContent;
+};
 const Message: React.FC<Props> = ({ message, onDelete }) => {
   const { menu, handleContextMenu } = useContextMenu([
     {
@@ -24,21 +37,6 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
     x: 2,
     y: -6,
   });
-
-  // https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
-  const preprocessLaTeX = (content: string) => {
-    // Replace block-level LaTeX delimiters \[ \] with $$ $$
-    const blockProcessedContent = message.content.replace(
-      /\\\[(.*?)\\\]/gs,
-      (_, equation) => `$$${equation}$$`,
-    );
-    // Replace inline LaTeX delimiters \( \) with $ $
-    const inlineProcessedContent = blockProcessedContent.replace(
-      /\\\((.*?)\\\)/gs,
-      (_, equation) => `$${equation}$`,
-    );
-    return inlineProcessedContent;
-  };
 
   return (
     <>
