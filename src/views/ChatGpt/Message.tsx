@@ -3,6 +3,10 @@ import { Chip, Typography } from '@mui/material';
 import { Delete as TrashIcon } from '@mui/icons-material';
 import type { ChatGptConversationMessage } from 'types';
 import { useContextMenu } from 'hooks';
+import Markdown from 'react-markdown';
+import rehypeKatex from 'rehype-katex';
+import remarkMath from 'remark-math';
+import 'katex/dist/katex.min.css';
 
 interface Props {
   message: ChatGptConversationMessage,
@@ -21,11 +25,31 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
     y: -6,
   });
 
+  // https://github.com/remarkjs/react-markdown/issues/785#issuecomment-1966495891
+  const preprocessLaTeX = (content: string) => {
+    // Replace block-level LaTeX delimiters \[ \] with $$ $$
+    const blockProcessedContent = message.content.replace(
+      /\\\[(.*?)\\\]/gs,
+      (_, equation) => `$$${equation}$$`,
+    );
+    // Replace inline LaTeX delimiters \( \) with $ $
+    const inlineProcessedContent = blockProcessedContent.replace(
+      /\\\((.*?)\\\)/gs,
+      (_, equation) => `$${equation}$`,
+    );
+    return inlineProcessedContent;
+  };
+
   return (
     <>
       <Chip
         onContextMenu={handleContextMenu}
-        label={<Typography variant="body1" sx={{ cursor: 'context-menu' }}>{message.content}</Typography>}
+        label={(
+          <Typography variant="body1" sx={{ cursor: 'context-menu' }}>
+            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLaTeX(message.content)}
+            </Markdown>
+          </Typography>
+)}
         color={message.role === 'assistant' ? 'default' : 'primary'}
         sx={{
           alignSelf: message.role === 'assistant' ? 'flex-start' : 'flex-end',
@@ -34,8 +58,7 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
           height: 'auto',
           '& .MuiChip-label': {
             display: 'block',
-            whiteSpace: 'pre-wrap',
-            py: '8px',
+            whiteSpace: 'normal',
           },
         }}
       />
