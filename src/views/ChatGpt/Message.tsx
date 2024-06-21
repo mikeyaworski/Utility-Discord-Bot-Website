@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chip, Typography } from '@mui/material';
+import { Chip, Box } from '@mui/material';
 import { Delete as TrashIcon } from '@mui/icons-material';
 import type { ChatGptConversationMessage } from 'types';
 import { useContextMenu } from 'hooks';
@@ -43,10 +43,28 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
       <Chip
         onContextMenu={handleContextMenu}
         label={(
-          <Typography variant="body1" sx={{ cursor: 'context-menu' }}>
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{preprocessLaTeX(message.content)}
+          <Box
+            sx={{
+              cursor: 'context-menu',
+              '& p': {
+                whiteSpace: 'pre-wrap',
+              },
+              '& p, ol, ul': {
+                my: 0.5,
+              },
+              '& h1, h2, h3': {
+                my: 1.5,
+              },
+              '& h4, h5, h6': {
+                my: 1,
+              },
+              '& pre': {
+                my: 1.5,
+              },
+            }}
+          >
             </Markdown>
-          </Typography>
+          </Box>
 )}
         color={message.role === 'assistant' ? 'default' : 'primary'}
         sx={{
@@ -57,6 +75,7 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
           '& .MuiChip-label': {
             display: 'block',
             whiteSpace: 'normal',
+            py: 0.5,
           },
         }}
       />
