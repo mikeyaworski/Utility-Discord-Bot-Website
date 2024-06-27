@@ -120,8 +120,8 @@ export interface CurrentTrackPlayTime {
   // all in MS
   started: number | null, // timestamp
   pauseStarted: number | null, // timestamp
-  totalPauseTime: number,
-  seeked: number | null,
+  totalPauseTimeMs: number,
+  seekedMs: number | null,
   speed: number,
 }
 

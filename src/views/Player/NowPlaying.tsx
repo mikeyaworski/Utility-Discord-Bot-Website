@@ -19,11 +19,11 @@ function getTrackCurrentTime(trackTimeData: CurrentTrackPlayTime, isPaused: bool
   if (!trackTimeData.started) return 0;
   const timeSinceStart = Date.now() - trackTimeData.started;
   const totalPauseTime = isPaused && trackTimeData.pauseStarted != null
-    ? (Date.now() - trackTimeData.pauseStarted) + trackTimeData.totalPauseTime
-    : trackTimeData.totalPauseTime;
+    ? (Date.now() - trackTimeData.pauseStarted) + trackTimeData.totalPauseTimeMs
+    : trackTimeData.totalPauseTimeMs;
   const timePlayed = (timeSinceStart - totalPauseTime) * trackTimeData.speed;
-  if (trackTimeData.seeked != null) {
-    return timePlayed + trackTimeData.seeked;
+  if (trackTimeData.seekedMs != null) {
+    return timePlayed + trackTimeData.seekedMs;
   }
   return timePlayed;
 }
