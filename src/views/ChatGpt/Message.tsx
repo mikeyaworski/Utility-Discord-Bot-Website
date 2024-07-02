@@ -50,7 +50,7 @@ const Message: React.FC<Props> = ({ message, onDelete }) => {
           <Box
             sx={{
               cursor: 'context-menu',
-              '& p': {
+              '& p, pre': {
                 whiteSpace: 'pre-wrap',
               },
               '& p, ol, ul': {
