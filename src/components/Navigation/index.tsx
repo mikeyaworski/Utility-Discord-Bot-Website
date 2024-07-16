@@ -47,11 +47,11 @@ const Navigation: React.FC<Props> = ({ children }) => {
         if (user) await refetchBotDm();
       } catch (err) {
         error('Error:', err);
-        alert.error('Could not log in');
+        alert.actions.error('Could not log in');
       }
     }
     if (validateOauthState(oauthState)) logIn();
-    else alert.error('Invalid OAuth State');
+    else alert.actions.error('Invalid OAuth State');
   }, [
     code,
     state,

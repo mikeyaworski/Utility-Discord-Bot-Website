@@ -34,7 +34,7 @@ export function useTryUpdate({
       setPlayerStatus(playerStatusBeforeUpdate);
       // @ts-ignore
       const body = await err.text();
-      alert.error(body);
+      alert.actions.error(body);
     }
   };
 }

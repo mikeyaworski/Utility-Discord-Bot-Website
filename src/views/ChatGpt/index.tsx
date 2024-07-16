@@ -51,7 +51,7 @@ const ChatGpt: React.FC = () => {
       setConversation(old => [{ role: 'assistant', content: chatGptResponse }, ...old]);
     } catch (err) {
       const errMsg = await getErrorMsg(err);
-      alert.error(`${get(err, 'status')}: ${errMsg}`);
+      alert.actions.error(`${get(err, 'status')}: ${errMsg}`);
       setInput(message);
       setConversation(old => old.slice(1));
     }

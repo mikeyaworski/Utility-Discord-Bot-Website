@@ -99,10 +99,10 @@ const PlayForm: React.FC<Props> = ({ playerStatus }) => {
         });
         setSubmitting(false);
         resetInputs();
-        alert.success(playerStatus?.currentTrack ? 'Success! Track(s) are being queued.' : 'Success! Track will play momentarily.');
+        alert.actions.success(playerStatus?.currentTrack ? 'Success! Track(s) are being queued.' : 'Success! Track will play momentarily.');
       } catch (err) {
         setSubmitting(false);
-        alert.error(await getErrorMsg(err));
+        alert.actions.error(await getErrorMsg(err));
       }
     }
   }

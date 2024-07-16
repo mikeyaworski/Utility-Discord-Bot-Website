@@ -164,13 +164,13 @@ const ChessView: React.FC = () => {
     });
     socket?.on(SocketEventTypes.CHESS_CHALLENGE_DECLINED, ({ id }: ChessGameIdData) => {
       setGames(old => old.filter(g => g.model.id !== id));
-      alert.error(`Game declined: ${id}`);
+      alert.actions.error(`Game declined: ${id}`);
     });
     socket?.on(SocketEventTypes.CHESS_GAME_RESIGNED, ({ id, resigner }: ChessGameForfeitData) => {
       if (user?.id === resigner) {
-        alert.success(`Game resigned: ${id}`);
+        alert.actions.success(`Game resigned: ${id}`);
       } else {
-        alert.success(`You've won game ${id} by resignation!`);
+        alert.actions.success(`You've won game ${id} by resignation!`);
       }
       addForfeitedGame(id);
     });
@@ -200,7 +200,7 @@ const ChessView: React.FC = () => {
       await handleGameUpdate(res);
       setSelectedGameId(gameId);
     } catch (err) {
-      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
     }
     setBusy(false);
   }
@@ -211,7 +211,7 @@ const ChessView: React.FC = () => {
       method: 'POST',
       path: `/chess/${gameId}/decline`,
     }).catch(err => {
-      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
     });
     setGames(old => old.filter(g => g.model.id !== gameId));
     setBusy(false);
@@ -228,7 +228,7 @@ const ChessView: React.FC = () => {
       });
       await handleGameUpdate(res);
     } catch (err) {
-      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
     }
     setBusy(false);
   }
@@ -239,7 +239,7 @@ const ChessView: React.FC = () => {
       method: 'POST',
       path: `/chess/${gameId}/resign`,
     }).catch(err => {
-      alert.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
     });
     addForfeitedGame(gameId);
     setBusy(false);
@@ -354,7 +354,7 @@ const ChessView: React.FC = () => {
             setGames(old => old.concat(res));
             setChallengeModalOpen(false);
           } catch (err) {
-            alert.error(`Something went wrong: ${get(err, 'status')}`);
+            alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
           }
           setBusy(false);
         }}

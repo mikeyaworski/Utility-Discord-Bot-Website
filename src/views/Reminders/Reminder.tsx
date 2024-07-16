@@ -71,10 +71,10 @@ const ReminderCard: React.FC<Props> = ({
         setEditModalBusy(false);
         setEditModalOpen(false);
         onReminderDeleted();
-        alert.info('Reminder was not found');
+        alert.actions.info('Reminder was not found');
       } else {
         setEditModalBusy(false);
-        alert.error(`Something went wrong: ${get(err, 'status')}`);
+        alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
       }
     }
   }, [onReminderUpdated, onReminderCreated, onReminderDeleted, alert]);
@@ -97,7 +97,7 @@ const ReminderCard: React.FC<Props> = ({
         onReminderDeleted();
       } else {
         setDeleteModalBusy(false);
-        alert.error(`Something went wrong: ${get(err, 'status')}`);
+        alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
       }
     }
   }, [onReminderDeleted, reminder.model.id, alert]);

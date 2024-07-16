@@ -1,22 +1,9 @@
-import React, { createContext, useContext, useCallback, useState, useMemo } from 'react';
+import React, { useCallback } from 'react';
+import { create } from 'zustand';
 import { Snackbar, Alert, SnackbarCloseReason } from '@mui/material';
 import { IntentionalAny } from 'types';
 
 type AlertFn = (message: string) => void;
-
-export interface AlertContextType {
-  success: AlertFn;
-  error: AlertFn;
-  warning: AlertFn;
-  info: AlertFn;
-}
-
-export const AlertContext = createContext<AlertContextType>({
-  success: () => {},
-  error: () => {},
-  warning: () => {},
-  info: () => {},
-});
 
 enum AlertType {
   SUCCESS = 'success',
@@ -25,55 +12,64 @@ enum AlertType {
   INFO = 'info',
 }
 
+export interface AlertStore {
+  open: boolean,
+  setOpen: (open: boolean) => void,
+  type: AlertType,
+  message: string,
+  actions: {
+    success: AlertFn;
+    error: AlertFn;
+    warning: AlertFn;
+    info: AlertFn;
+  },
+}
+
+export const useAlert = create<AlertStore>()(set => ({
+  open: false,
+  setOpen: (open: boolean) => set({ open }),
+  type: AlertType.SUCCESS,
+  message: '',
+  actions: {
+    success: (message: string) => set({
+      open: true,
+      type: AlertType.SUCCESS,
+      message,
+    }),
+    error: (message: string) => set({
+      open: true,
+      type: AlertType.ERROR,
+      message,
+    }),
+    warning: (message: string) => set({
+      open: true,
+      type: AlertType.WARNING,
+      message,
+    }),
+    info: (message: string) => set({
+      open: true,
+      type: AlertType.INFO,
+      message,
+    }),
+  },
+}));
+
 interface Props {
   children: React.ReactNode,
 }
 
 export const AlertProvider: React.FC<Props> = ({ children }) => {
-  const [message, setMessage] = useState('');
-  const [open, setOpen] = useState(false);
-  const [type, setType] = useState(AlertType.SUCCESS);
-
-  const handleOpen = useCallback((newMessage: string, newType: AlertType) => {
-    setType(newType);
-    setMessage(newMessage);
-    setOpen(true);
-  }, []);
+  const open = useAlert(store => store.open);
+  const message = useAlert(store => store.message);
+  const type = useAlert(store => store.type);
+  const setOpen = useAlert(store => store.setOpen);
 
   const handleClose = useCallback((
     e: Event | React.SyntheticEvent<IntentionalAny, Event>,
     reason: SnackbarCloseReason,
   ) => {
     if (reason === 'timeout') setOpen(false);
-  }, []);
-
-  const handleSuccess = useCallback((newMessage: string) => {
-    handleOpen(newMessage, AlertType.SUCCESS);
-  }, [handleOpen]);
-
-  const handleError = useCallback((newMessage: string) => {
-    handleOpen(newMessage, AlertType.ERROR);
-  }, [handleOpen]);
-
-  const handleWarning = useCallback((newMessage: string) => {
-    handleOpen(newMessage, AlertType.WARNING);
-  }, [handleOpen]);
-
-  const handleInfo = useCallback((newMessage: string) => {
-    handleOpen(newMessage, AlertType.INFO);
-  }, [handleOpen]);
-
-  const value = useMemo(() => ({
-    success: handleSuccess,
-    error: handleError,
-    warning: handleWarning,
-    info: handleInfo,
-  }), [
-    handleSuccess,
-    handleError,
-    handleWarning,
-    handleInfo,
-  ]);
+  }, [setOpen]);
 
   return (
     <>
@@ -85,14 +81,7 @@ export const AlertProvider: React.FC<Props> = ({ children }) => {
       >
         <Alert severity={type} variant="filled">{message}</Alert>
       </Snackbar>
-      <AlertContext.Provider value={value}>
-        {children}
-      </AlertContext.Provider>
+      {children}
     </>
   );
 };
-
-export function useAlert(): AlertContextType {
-  const alertContext = useContext(AlertContext);
-  return alertContext;
-}
