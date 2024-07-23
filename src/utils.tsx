@@ -274,10 +274,14 @@ export function getClockString(durationMs: number, minPortionLength = 0): string
 
 export async function getErrorMsg(err: unknown): Promise<string> {
   if (err && typeof err === 'object' && 'text' in err && typeof err.text === 'function') {
-    return err.text();
+    const text = await err.text();
+    if (text) return text;
   }
   if (err && typeof err === 'object' && 'message' in err && err.message) {
     return String(err.message);
+  }
+  if (err && typeof err === 'object' && 'status' in err && err.status) {
+    return `Status: ${err.status}`;
   }
   return 'Something went wrong.';
 }
