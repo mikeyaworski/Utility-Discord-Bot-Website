@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { fetchApi } from 'utils';
+import { fetchApi, reorder } from 'utils';
 import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
 import { PlayerStatusData } from 'types/sockets';
 import { GuildContext } from 'contexts/guild';
@@ -13,13 +13,6 @@ interface Props {
   setBusy: SetState<boolean>,
   playerStatus: PlayerStatusData,
   setPlayerStatus: SetState<PlayerStatusData | null>,
-}
-
-function reorder<T = unknown[]>(list: T[], startIndex: number, endIndex: number) {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
 }
 
 // TODO: Implement a virtual list that isn't buggy and render the full queue
