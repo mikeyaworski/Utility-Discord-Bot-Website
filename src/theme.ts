@@ -1,5 +1,13 @@
 import { createTheme } from '@mui/material';
 
+const ALT_BACKGROUND_COLOR = '#282828';
+
+declare module '@mui/material/styles' {
+  interface PaletteOptions {
+    altBackground?: PaletteOptions['primary'];
+  }
+}
+
 export default createTheme({
   palette: {
     mode: 'dark',
@@ -10,6 +18,10 @@ export default createTheme({
     secondary: {
       // Discord blue
       main: '#404EED',
+      contrastText: '#FFFFFF',
+    },
+    altBackground: {
+      main: ALT_BACKGROUND_COLOR,
       contrastText: '#FFFFFF',
     },
   },
