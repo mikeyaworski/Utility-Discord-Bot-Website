@@ -25,7 +25,7 @@ import CreateModal, { Payload as CreateReminderPayload } from './CreateModal';
 
 const sortPrefKey = 'REMINDERS_SORT_PREFERENCE';
 
-enum Sorts {
+enum Sort {
   CREATED_DESC,
   NEXT_RUN_ASC,
 }
@@ -34,10 +34,10 @@ const Reminders: React.FC = () => {
   const alert = useAlert();
   const { user } = useContext(AuthContext);
   const { selectedGuildId } = useContext(GuildContext);
-  const [sort, setSort] = useState<Sorts>(() => {
+  const [sort, setSort] = useState<Sort>(() => {
     const pref = window.localStorage.getItem(sortPrefKey);
     if (pref != null) return Number(pref);
-    return Sorts.NEXT_RUN_ASC;
+    return Sort.NEXT_RUN_ASC;
   });
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -127,12 +127,12 @@ const Reminders: React.FC = () => {
     .filter(r => (r.model.message || 'Timer is up!').toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       switch (sort) {
-        case Sorts.NEXT_RUN_ASC: {
+        case Sort.NEXT_RUN_ASC: {
           const aNextRun = a.nextRun != null ? a.nextRun : a.model.time * 1000;
           const bNextRun = b.nextRun != null ? b.nextRun : b.model.time * 1000;
           return new Date(aNextRun) < new Date(bNextRun) ? -1 : 1;
         }
-        case Sorts.CREATED_DESC:
+        case Sort.CREATED_DESC:
         default: {
           return new Date(a.model.createdAt) < new Date(b.model.createdAt) ? 1 : -1;
         }
@@ -165,10 +165,10 @@ const Reminders: React.FC = () => {
           select
           value={sort}
           label="Sort By"
-          onChange={e => setSort(e.target.value as unknown as Sorts)}
+          onChange={e => setSort(e.target.value as unknown as Sort)}
         >
-          <MenuItem value={Sorts.CREATED_DESC}>Date Created</MenuItem>
-          <MenuItem value={Sorts.NEXT_RUN_ASC}>Next Run Time</MenuItem>
+          <MenuItem value={Sort.CREATED_DESC}>Date Created</MenuItem>
+          <MenuItem value={Sort.NEXT_RUN_ASC}>Next Run Time</MenuItem>
         </TextField>
       </Box>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
