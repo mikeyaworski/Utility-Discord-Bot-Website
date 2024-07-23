@@ -164,7 +164,6 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
         onConfirm={() => setSaveToListsModalOpen(false)}
         movie={movie}
       />
-      {/* @ts-ignore This is a property that we include in our custom theme. */}
       <Card sx={{ width: '100%', background: altBackground ? theme.palette.altBackground.main : undefined, flexGrow: 1 }}>
         <CardHeader
           title={(

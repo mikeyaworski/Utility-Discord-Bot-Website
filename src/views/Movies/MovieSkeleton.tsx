@@ -35,7 +35,6 @@ function UnorderedListSkeleton({ size }: { size: number }) {
 const MovieSkeleton: React.FC<Props> = ({ altBackground }) => {
   const theme = useTheme();
   return (
-    // @ts-ignore This is a property that we include in our custom theme.
     <Card sx={{ width: '100%', background: altBackground ? theme.palette.altBackground.main : undefined }}>
       <CardHeader
         title={(

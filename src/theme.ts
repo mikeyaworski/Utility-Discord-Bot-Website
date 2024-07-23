@@ -3,8 +3,11 @@ import { createTheme } from '@mui/material';
 const ALT_BACKGROUND_COLOR = '#282828';
 
 declare module '@mui/material/styles' {
+  interface Palette {
+    altBackground: Palette['primary'];
+  }
   interface PaletteOptions {
-    altBackground?: PaletteOptions['primary'];
+    altBackground: PaletteOptions['primary'];
   }
 }
 
