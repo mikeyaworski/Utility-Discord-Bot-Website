@@ -25,4 +25,13 @@ export default createTheme({
       contrastText: '#FFFFFF',
     },
   },
+  components: {
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          color: 'white',
+        },
+      },
+    },
+  },
 });
