@@ -17,7 +17,7 @@ const ConfirmModal: React.FC<Props> = ({
       <Typography variant="h6">
         {title}
       </Typography>
-      <Typography sx={{ mt: 2 }}>
+      <Typography sx={{ mt: 2, whiteSpace: 'pre-wrap' }}>
         {details}
       </Typography>
     </BaseModal>
