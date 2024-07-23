@@ -5,7 +5,7 @@ import { IntentionalAny } from 'types';
 
 type AlertFn = (message: string) => void;
 
-enum AlertType {
+export enum AlertType {
   SUCCESS = 'success',
   ERROR = 'error',
   WARNING = 'warning',

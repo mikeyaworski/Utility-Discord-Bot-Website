@@ -9,6 +9,7 @@ import Reminders from 'views/Reminders';
 import Player from 'views/Player';
 import Chess from 'views/Chess';
 import ChatGpt from 'views/ChatGpt';
+import Movies from 'views/Movies';
 
 const AppRouter: React.FC = () => {
   const code = useQueryParam('code');
@@ -36,6 +37,7 @@ const AppRouter: React.FC = () => {
           <Route path="/player" element={<Player />} />
           <Route path="/chess" element={<Chess />} />
           <Route path="/chatgpt" element={<ChatGpt />} />
+          <Route path="/movies" element={<Movies />} />
         </Routes>
       </Navigation>
     </Router>

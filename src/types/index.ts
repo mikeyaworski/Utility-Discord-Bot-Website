@@ -5,6 +5,10 @@ export type IntentionalAny = any;
 
 export type Falsy = | undefined | '' | false | null | 0;
 
+export interface IdObject {
+  id: string,
+}
+
 // https://discord.com/developers/docs/resources/guild#guild-object
 export interface Guild {
   id: string,
@@ -169,4 +173,68 @@ export interface Favorite {
 export interface ChatGptConversationMessage {
   role: 'user' | 'assistant',
   content: string,
+}
+
+export type MovieListMinimal = Pick<MovieList, 'id' | 'custom_id' | 'name'>;
+
+export interface Movie {
+  id: string,
+  guild_id: string,
+  title: string,
+  is_favorite: boolean,
+  was_watched: boolean,
+  length: number | null, // in minutes
+  actors: string | null, // comma-separated
+  director: string | null,
+  genre: string | null, // comma-separated
+  year: number | null,
+  imdb_id: string | null,
+  imdb_rating: number | null, // 0-100
+  metacritic_rating: number | null, // 0-100
+  rotten_tomatoes_rating: number | null, // 0-100
+  rating: string | null,
+  language: string | null,
+
+  // Associations
+  notes?: MovieNote[],
+  lists: MovieListMinimal[],
+}
+
+export interface MovieWithOrder extends Movie {
+  order: number,
+}
+
+export interface MovieWithOrderOnly {
+  id: string,
+  order: number,
+}
+
+export interface MovieListFromServer {
+  id: string,
+  guild_id: string,
+  name: string,
+  custom_id: string | null,
+
+  // Associations
+  movies: MovieWithOrderOnly[],
+}
+
+export interface MovieList {
+  id: string,
+  guild_id: string,
+  name: string,
+  custom_id: string | null,
+
+  // Associations
+  movies: MovieWithOrder[],
+}
+
+export interface MovieNote {
+  id: string,
+  movie_id: string,
+  author_id: string,
+  note: string,
+
+  // Associations
+  movie?: Movie,
 }

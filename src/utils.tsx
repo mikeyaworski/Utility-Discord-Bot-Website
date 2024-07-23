@@ -1,7 +1,7 @@
-import { Guild, Role, Member, Channel, ChannelType, MessagePartType, MessagePart } from 'types';
-import humanizeDurationUtil from 'humanize-duration';
+import humanizeDurationUtil from 'pretty-ms';
 import { parseDate } from 'chrono-node';
-import type { Falsy } from 'types';
+import { Guild, Role, Member, Channel, ChannelType, MessagePartType, MessagePart, Falsy } from 'types';
+import { AlertType, useAlert } from 'alerts';
 
 export async function fetchApi<T = unknown>({
   path,
@@ -41,7 +41,8 @@ export function getGuildIcon(guild: Guild): string {
 
 export function humanizeDuration(durationMs: number): string {
   return humanizeDurationUtil(durationMs, {
-    maxDecimalPoints: 0,
+    secondsDecimalDigits: 0,
+    verbose: false,
   });
 }
 
@@ -300,4 +301,16 @@ export function reorder<T = unknown[]>(list: T[], startIndex: number, endIndex: 
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
   return result;
+}
+
+export async function alertError(err: unknown): Promise<void> {
+  // Zustand allows for use outside of a React component.
+  // And although it's not necessary since we can just use the hook as a hook,
+  // this is very convenient and removes boilerplate.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useAlert.setState({
+    open: true,
+    type: AlertType.ERROR,
+    message: await getErrorMsg(err),
+  });
 }
