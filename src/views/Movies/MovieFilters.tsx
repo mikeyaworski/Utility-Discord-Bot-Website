@@ -158,10 +158,7 @@ const MovieFilters: React.FC<Props> = ({ filters, setFilters, disabled = false }
 
   function addFilter() {
     // @ts-ignore TODO: Improve the typing
-    setFilterProperty(filterFieldKey, {
-      value: filterFieldValue,
-      comparator: filterFieldComparator,
-    });
+    setFilterProperty(filterFieldKey, { value: filterFieldValue, comparator: filterFieldComparator });
     setFilterAnchor(null);
   }
 

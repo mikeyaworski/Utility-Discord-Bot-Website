@@ -56,7 +56,8 @@ function filterMovie(movie: Movie, filters: Filters): boolean {
     'language',
   ];
   filterKeys.forEach(filterKey => {
-    if (filters[filterKey] != null && !compare(movie[filterKey], filters[filterKey].value, filters[filterKey].comparator)) {
+    const filter = filters[filterKey];
+    if (filter != null && !compare(movie[filterKey], filter.value, filter.comparator)) {
       isMatch = false;
     }
   });
