@@ -164,6 +164,13 @@ export function useConvertDiscordMentionsToReactMentions(): (data: string) => st
   }, [roles, members, channels]);
 }
 
+export function useGetMemberName(): (memberId: string) => Member | undefined {
+  const { members } = useContext(GuildContext);
+  return useCallback((memberId: string) => {
+    return members?.find(m => m.id === memberId);
+  }, [members]);
+}
+
 export function useParseDiscordMentions(): (data: string) => ReturnType<typeof parseDiscordMentions> {
   const { members, roles, channels } = useContext(GuildContext);
   return useCallback((data: string) => {
