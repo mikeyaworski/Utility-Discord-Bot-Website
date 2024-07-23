@@ -215,7 +215,7 @@ interface UseSetReturn<T> {
   remove: (value: T) => void,
 }
 export function useSet<T = unknown>(initialData?: T[]): UseSetReturn<T> {
-  const [data, setData] = useState(new Set<T>(initialData));
+  const [data, setData] = useState(() => new Set<T>(initialData));
   const add = useCallback((newValue: T) => {
     setData(old => new Set(old).add(newValue));
   }, []);
@@ -274,7 +274,7 @@ export function useConfirmationModal(modalProps?: Partial<BaseModalProps>): UseC
       onClose={() => setOpen(false)}
       onConfirm={async () => {
         setBusy(true);
-        if (confirmFn) confirmFn();
+        if (confirmFn) await confirmFn();
         setBusy(false);
         closeModal();
       }}
