@@ -32,7 +32,17 @@ const MoviesSkeleton: React.FC = () => {
       <Fab
         title="Create New List"
         color="primary"
-        sx={{ position: 'fixed', right: 40, bottom: 40 }}
+        sx={{
+          position: 'fixed',
+          right: {
+            xs: 20,
+            md: 80,
+          },
+          bottom: {
+            xs: 20,
+            md: 50,
+          },
+        }}
         onClick={() => {}}
         disabled
       >

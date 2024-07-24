@@ -5,6 +5,7 @@ interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
+  style?: React.CSSProperties,
 }
 
 function CustomTabPanel(props: TabPanelProps) {
@@ -16,7 +17,10 @@ function CustomTabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box py={2}>
+        <Box
+          pt={2}
+          height="100%"
+        >
           {children}
         </Box>
       )}
@@ -42,7 +46,7 @@ const CustomTabs: React.FC<Props> = ({ selectedTab, setSelectedTab, tabsData }) 
   };
 
   return (
-    <Box width="100%">
+    <Box height="100%" width="100%" display="flex" flexDirection="column">
       <Box borderBottom={1} borderColor="divider">
         <Tabs value={selectedTab} onChange={handleChange}>
           {tabsData.map(tab => (
@@ -51,7 +55,7 @@ const CustomTabs: React.FC<Props> = ({ selectedTab, setSelectedTab, tabsData }) 
         </Tabs>
       </Box>
       {tabsData.map((tab, i) => (
-        <CustomTabPanel key={tab.label} value={selectedTab} index={i}>
+        <CustomTabPanel key={tab.label} value={selectedTab} index={i} style={{ flexGrow: 1 }}>
           {tab.body}
         </CustomTabPanel>
       ))}

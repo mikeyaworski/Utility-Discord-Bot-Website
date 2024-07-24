@@ -168,7 +168,7 @@ const PlayForm: React.FC<Props> = ({ playerStatus }) => {
             },
           ]}
         />
-        <Box>
+        <Box mt={2}>
           <FormControlLabel
             label="Shuffle"
             control={(

@@ -1,6 +1,9 @@
 import type { IntentionalAny, Movie } from 'types';
 
 import React, { useContext, useState } from 'react';
+import { VList } from 'virtua';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import chunk from 'lodash.chunk';
 import {
   Box,
   Fab,
@@ -113,6 +116,7 @@ const Movies: React.FC = () => {
     sortOrder: SortOrder.DESC,
   });
 
+  const filteredMovies = moviesQuery.data.filter(movie => filterMovie(movie, filters)).sort(sortMovies(filters));
   return (
     <>
       <CreateMovieModal
@@ -120,18 +124,50 @@ const Movies: React.FC = () => {
         onClose={() => setCreateModalOpen(false)}
         onConfirm={() => setCreateModalOpen(false)}
       />
-      <MovieFilters filters={filters} setFilters={setFilters} />
-      <Box display="flex" flexWrap="wrap" alignItems="stretch" gap={2}>
-        {moviesQuery.data.filter(movie => filterMovie(movie, filters)).sort(sortMovies(filters)).map(movie => (
-          <Box key={movie.id} width={320}>
-            <MovieCard key={movie.id} movie={movie} altBackground={false} />
-          </Box>
-        ))}
+      <Box display="flex" flexDirection="column" height="100%">
+        <MovieFilters filters={filters} setFilters={setFilters} />
+        <Box flexGrow={1}>
+          <AutoSizer>
+            {({ height, width }) => {
+              const movieWidth = 320;
+              const paddingBetweenMovies = 8;
+              const moviesPerRow = Math.floor(width / (movieWidth + paddingBetweenMovies));
+              const chunks = chunk(filteredMovies, moviesPerRow);
+              return (
+                <VList style={{ height, width }}>
+                  {chunks.map(movies => (
+                    <Box key={movies.map(m => m.id).join('')} display="flex" gap={1} mb={1}>
+                      {movies.map(movie => (
+                        <Box key={movie.id} width={movieWidth}>
+                          <MovieCard
+                            key={movie.id}
+                            movie={movie}
+                            altBackground={false}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  ))}
+                </VList>
+              );
+            }}
+          </AutoSizer>
+        </Box>
       </Box>
       <Fab
         title="Create New List"
         color="primary"
-        sx={{ position: 'fixed', right: 40, bottom: 40 }}
+        sx={{
+          position: 'fixed',
+          right: {
+            xs: 20,
+            md: 80,
+          },
+          bottom: {
+            xs: 20,
+            md: 50,
+          },
+        }}
         onClick={() => setCreateModalOpen(true)}
         disabled={!selectedGuildId || !user}
       >
