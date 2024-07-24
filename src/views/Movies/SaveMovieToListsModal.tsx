@@ -155,6 +155,7 @@ const SaveMovieToListsModal: React.FC<Props> = ({
       >
         {listsQuery.data.map(list => (
           <FormControlLabel
+            key={list.id}
             label={list.name}
             control={(
               <Checkbox
