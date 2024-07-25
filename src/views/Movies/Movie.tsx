@@ -242,11 +242,13 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
           </Row>
           <Collapse in={notesExpanded && Boolean(movie.notes?.length)}>
             <Field label="Notes" value="" />
-            {movie.notes?.map(note => (
-              <Typography key={note.author_id} variant="body2">
-                <Mention value={`@${getMemberName(note.author_id)?.name || note.author_id}`} />: {note.note}
-              </Typography>
-            ))}
+            <Box display="flex" flexDirection="column" gap={0.5}>
+              {movie.notes?.map(note => (
+                <Typography key={note.author_id} variant="body2">
+                  <Mention value={`@${getMemberName(note.author_id)?.name || note.author_id}`} />: {note.note}
+                </Typography>
+              ))}
+            </Box>
           </Collapse>
         </CardContent>
       </Card>
