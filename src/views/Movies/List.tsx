@@ -175,10 +175,10 @@ const List: React.FC<Props> = ({
             <Box display="flex" gap={1} alignItems="flex-start">
               <Button
                 size="small"
-                startIcon={<SaveIcon color="primary" />}
+                startIcon={<SaveIcon color={saveChangesMutation.isPending ? 'inherit' : 'primary'} />}
                 sx={{ whiteSpace: 'nowrap', visibility: hasStateChanged ? 'visible' : 'hidden' }}
                 onClick={() => saveChangesMutation.mutate()}
-                disabled={!hasStateChanged}
+                disabled={saveChangesMutation.isPending}
               >
                 Save
               </Button>
