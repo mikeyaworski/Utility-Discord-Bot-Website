@@ -23,7 +23,6 @@ const NoteModal: React.FC<Props> = ({
   ...baseModalProps
 }) => {
   const alert = useAlert(store => store.actions);
-  const [busy, setBusy] = useState(false);
   const { selectedGuildId } = useContext(GuildContext);
   const queryClient = useQueryClient();
   const existingNote = useMyMovieNote(movie);
@@ -35,7 +34,6 @@ const NoteModal: React.FC<Props> = ({
 
   const mutation = useMutation({
     mutationFn: async () => {
-      setBusy(true);
       if (input) {
         const newNote = await fetchApi<MovieNote>({
           method: 'PUT',
@@ -74,7 +72,6 @@ const NoteModal: React.FC<Props> = ({
     },
     onSuccess: changeStatus => {
       onConfirm();
-      setBusy(false);
       switch (changeStatus) {
         case NoteChangeStatus.SET: {
           alert.success('Note saved');
@@ -89,7 +86,6 @@ const NoteModal: React.FC<Props> = ({
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -100,7 +96,7 @@ const NoteModal: React.FC<Props> = ({
       confirmText={isDeleting ? 'Delete Note' : 'Set Note'}
       canConfirm={Boolean(existingNote || input)}
       confirmColor={isDeleting ? 'error' : 'primary'}
-      busy={busy}
+      busy={mutation.isPending}
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Set Note</Typography>
       <TextField

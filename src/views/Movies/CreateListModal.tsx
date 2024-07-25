@@ -15,13 +15,11 @@ const CreateListModal: React.FC<BaseModalProps> = ({
   const queryClient = useQueryClient();
   const alert = useAlert(store => store.actions);
 
-  const [busy, setBusy] = useState(false);
   const [name, setName] = useState('');
   const [customId, setCustomId] = useState('');
 
   const mutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<MovieListFromServer>({
         method: 'POST',
         path: `/movies/${selectedGuildId}/lists`,
@@ -37,14 +35,12 @@ const CreateListModal: React.FC<BaseModalProps> = ({
         old => old?.concat(newList),
       );
       onConfirm();
-      setBusy(false);
       setName('');
       setCustomId('');
       alert.success('List created');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -54,7 +50,7 @@ const CreateListModal: React.FC<BaseModalProps> = ({
       onConfirm={() => mutation.mutate()}
       confirmText="Create"
       canConfirm={Boolean(name)}
-      busy={busy}
+      busy={mutation.isPending}
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Create List</Typography>
       <Box display="flex" flexDirection="column" gap={2}>

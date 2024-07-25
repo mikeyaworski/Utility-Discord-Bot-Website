@@ -28,7 +28,6 @@ const AddMoviesToListModal: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const alert = useAlert(store => store.actions);
 
-  const [busy, setBusy] = useState(false);
   const [newMovies, setNewMovies] = useState<Option<string>[]>([]);
   const [createMovieInput, setCreateMovieInput] = useState('');
   const [isCreatingNewMovie, setIsCreatingNewMovie] = useState(false);
@@ -43,7 +42,6 @@ const AddMoviesToListModal: React.FC<Props> = ({
 
   const createMovieMutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<Movie>({
         method: 'POST',
         path: `/movies/${selectedGuildId}`,
@@ -64,12 +62,10 @@ const AddMoviesToListModal: React.FC<Props> = ({
       setNewMovies(old => [{ label: newMovie.title, value: newMovie.id }, ...old]);
       setIsCreatingNewMovie(false);
       setCreateMovieInput('');
-      setBusy(false);
       alert.success('Movie created');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -83,7 +79,7 @@ const AddMoviesToListModal: React.FC<Props> = ({
       onConfirm={() => onConfirm(newMovies.map(movie => ({ id: movie.value })))}
       confirmText="Save"
       canConfirm={newMovies.length > 0}
-      busy={busy}
+      busy={createMovieMutation.isPending}
     >
       <Typography variant="h5">Add Movies To List</Typography>
       <Typography variant="body2" sx={{ mb: 2 }}>List: {list.name}</Typography>
@@ -99,7 +95,7 @@ const AddMoviesToListModal: React.FC<Props> = ({
         variant="text"
         startIcon={isCreatingNewMovie ? <RemoveIcon /> : <AddIcon />}
         onClick={() => setIsCreatingNewMovie(old => !old)}
-        disabled={busy}
+        disabled={createMovieMutation.isPending}
         sx={{ my: 1 }}
       >
         Create New Movie
@@ -125,7 +121,7 @@ const AddMoviesToListModal: React.FC<Props> = ({
               <Button
                 sx={{ ml: 'auto' }}
                 type="submit"
-                disabled={busy}
+                disabled={createMovieMutation.isPending}
               >
                 Create
               </Button>

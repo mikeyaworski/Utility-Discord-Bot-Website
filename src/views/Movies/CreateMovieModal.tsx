@@ -18,14 +18,12 @@ const CreateMovieModal: React.FC<BaseModalProps> = ({
   const queryClient = useQueryClient();
   const alert = useAlert(store => store.actions);
 
-  const [busy, setBusy] = useState(false);
   const [input, setInput] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [wasWatched, setWasWatched] = useState(false);
 
   const mutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<Movie>({
         method: 'POST',
         path: `/movies/${selectedGuildId}`,
@@ -48,7 +46,6 @@ const CreateMovieModal: React.FC<BaseModalProps> = ({
       );
       queryClient.invalidateQueries({ queryKey: ['movies', selectedGuildId] });
       onConfirm();
-      setBusy(false);
       setInput('');
       setIsFavorite(false);
       setWasWatched(false);
@@ -56,7 +53,6 @@ const CreateMovieModal: React.FC<BaseModalProps> = ({
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -66,7 +62,7 @@ const CreateMovieModal: React.FC<BaseModalProps> = ({
       onConfirm={() => mutation.mutate()}
       confirmText="Create"
       canConfirm={Boolean(input)}
-      busy={busy}
+      busy={mutation.isPending}
       allowFormSubmission
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Create Movie</Typography>

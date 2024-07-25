@@ -60,8 +60,6 @@ const EditMovieModal: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const alert = useAlert(store => store.actions);
 
-  const [busy, setBusy] = useState(false);
-
   const getMovieInput = useCallback(() => ({
     title: movie.title,
     isFavorite: movie.is_favorite,
@@ -83,7 +81,6 @@ const EditMovieModal: React.FC<Props> = ({
 
   const mutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<Movie>({
         method: 'PATCH',
         path: `/movies/${selectedGuildId}/${movie.imdb_id}`,
@@ -98,12 +95,10 @@ const EditMovieModal: React.FC<Props> = ({
       );
       queryClient.invalidateQueries({ queryKey: ['movies', selectedGuildId] });
       onConfirm();
-      setBusy(false);
       alert.success('Movie updated');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -129,7 +124,7 @@ const EditMovieModal: React.FC<Props> = ({
       onConfirm={() => mutation.mutate()}
       confirmText="Create"
       canConfirm={Boolean(input.title)}
-      busy={busy}
+      busy={mutation.isPending}
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Edit Movie</Typography>
       <Box display="flex" flexDirection="column" gap={2}>

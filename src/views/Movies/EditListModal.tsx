@@ -20,7 +20,6 @@ const EditListModal: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const alert = useAlert(store => store.actions);
 
-  const [busy, setBusy] = useState(false);
   const [name, setName] = useState<string>(list.name);
   const [customId, setCustomId] = useState<string>(list.custom_id || '');
 
@@ -31,7 +30,6 @@ const EditListModal: React.FC<Props> = ({
 
   const mutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<MovieListFromServer>({
         method: 'PATCH',
         path: `/movies/${selectedGuildId}/lists/${list.id}`,
@@ -51,12 +49,10 @@ const EditListModal: React.FC<Props> = ({
         } : l)),
       );
       onConfirm();
-      setBusy(false);
       alert.success('List info updated');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -66,7 +62,7 @@ const EditListModal: React.FC<Props> = ({
       onConfirm={() => mutation.mutate()}
       confirmText="Save"
       canConfirm={Boolean(name)}
-      busy={busy}
+      busy={mutation.isPending}
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Edit List</Typography>
       <Box display="flex" flexDirection="column" gap={2}>

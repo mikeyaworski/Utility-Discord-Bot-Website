@@ -32,7 +32,6 @@ const SaveMovieToListsModal: React.FC<Props> = ({
 
   const setWorkingMoviesList = useSetAtom(WorkingMovieListsAtom);
 
-  const [busy, setBusy] = useState(false);
   const [createListName, setCreateListName] = useState('');
   const [createListCustomId, setCreateListCustomId] = useState('');
   const [isCreatingNewList, setIsCreatingNewList] = useState(false);
@@ -54,7 +53,6 @@ const SaveMovieToListsModal: React.FC<Props> = ({
 
   const createListMutation = useMutation({
     mutationFn: () => {
-      setBusy(true);
       return fetchApi<MovieListFromServer>({
         method: 'POST',
         path: `/movies/${selectedGuildId}/lists`,
@@ -72,18 +70,15 @@ const SaveMovieToListsModal: React.FC<Props> = ({
       setIsCreatingNewList(false);
       setCreateListName('');
       setCreateListCustomId('');
-      setBusy(false);
       alert.success('List created');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
   const setMovieListsMutation = useMutation({
     mutationFn: async () => {
-      setBusy(true);
       const newListIds = Array.from(listsSet);
       await fetchApi<Movie>({
         method: 'PUT',
@@ -120,12 +115,10 @@ const SaveMovieToListsModal: React.FC<Props> = ({
       setIsCreatingNewList(false);
       setCreateListName('');
       setCreateListCustomId('');
-      setBusy(false);
       alert.success('Saved lists for movie');
     },
     onError: err => {
       alertError(err);
-      setBusy(false);
     },
   });
 
@@ -134,6 +127,7 @@ const SaveMovieToListsModal: React.FC<Props> = ({
     onConfirm();
   }
 
+  const busy = createListMutation.isPending || setMovieListsMutation.isPending;
   return (
     <BaseModal
       {...baseModalProps}
