@@ -1,5 +1,6 @@
 import React from 'react';
 import { Checkbox, TextField, Autocomplete, TextFieldProps } from '@mui/material';
+import { autocompleteClasses } from '@mui/material/Autocomplete';
 import {
   CheckBox as CheckboxIcon,
   CheckBoxOutlineBlank as CheckboxOutlineBlankIcon,
@@ -17,6 +18,7 @@ const CheckboxesTags: React.FC<Props> = ({ options, value, setValue, inputProps 
   return (
     <Autocomplete
       multiple
+      autoHighlight
       options={options}
       disableCloseOnSelect
       getOptionLabel={option => option.label}
@@ -26,12 +28,21 @@ const CheckboxesTags: React.FC<Props> = ({ options, value, setValue, inputProps 
             <Checkbox
               icon={<CheckboxOutlineBlankIcon fontSize="small" />}
               checkedIcon={<CheckboxIcon fontSize="small" />}
-              style={{ marginRight: 8 }}
               checked={selected}
             />
             {option.label}
           </li>
         );
+      }}
+      slotProps={{
+        paper: {
+          sx: {
+            [`& .${autocompleteClasses.listbox} .${autocompleteClasses.option}`]: {
+              py: 0,
+              px: 0.5,
+            },
+          },
+        },
       }}
       isOptionEqualToValue={(option, value) => option.value === value.value}
       value={value}
