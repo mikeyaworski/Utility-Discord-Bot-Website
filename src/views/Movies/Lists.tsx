@@ -26,11 +26,8 @@ const MovieLists: React.FC = () => {
       />
       <Box display="flex" flexWrap="wrap" mb={2} gap={2}>
         {listsQuery.data.map(list => (
-          <Suspense fallback={<ListSkeleton name={list.name} id={list.custom_id || list.id} />}>
-            <List
-              key={list.id}
-              list={list}
-            />
+          <Suspense key={list.id} fallback={<ListSkeleton name={list.name} id={list.custom_id || list.id} />}>
+            <List list={list} />
           </Suspense>
         ))}
       </Box>
