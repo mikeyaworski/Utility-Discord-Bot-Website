@@ -1,9 +1,17 @@
 import type { IdObject, MovieList, MovieListFromServer, MovieWithOrderOnly } from 'types';
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useLayoutEffect, forwardRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import uniqBy from 'lodash.uniqby';
-import { DragDropContext, Droppable, Draggable, OnDragEndResponder } from 'react-beautiful-dnd';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DraggableProvided,
+  DroppableProvided,
+  OnDragEndResponder,
+} from 'react-beautiful-dnd';
+import { Virtualizer, CustomItemComponentProps } from 'virtua';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box,
@@ -32,6 +40,101 @@ import EditListModal from './EditListModal';
 import AddMoviesToListModal from './AddMoviesToListModal';
 import { WorkingMovieListsAtom } from './index';
 import { orderMovies, useFetchMovies } from './utils';
+
+const ITEM_HEIGHT = 50;
+
+const Item = ({
+  id,
+  isDragging,
+  provided,
+}: {
+  id: string;
+  isDragging: boolean;
+  provided: DraggableProvided;
+}) => {
+  return (
+    <div
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      ref={provided.innerRef}
+      style={{
+        height: ITEM_HEIGHT,
+        color: 'white',
+        borderBottom: 'solid 1px #ccc',
+        background: isDragging ? 'skyblue' : undefined,
+        ...provided.draggableProps.style,
+      }}
+    >
+      TODO: {id}
+    </div>
+  );
+};
+
+const ItemWithMinHeight = forwardRef<HTMLDivElement, CustomItemComponentProps>(
+  ({ children, style }, ref) => {
+    return (
+      <div ref={ref} style={{ ...style, minHeight: ITEM_HEIGHT }}>
+        {children}
+      </div>
+    );
+  },
+);
+
+// TODO: Just use forwardRef for this
+/* eslint-disable max-len */
+// const VirtualList = forwardRef<HTMLElement, { children: React.ReactElement[], isUsingPlaceholder: boolean }>(({
+const VirtualList = (({
+  innerRef,
+  children,
+  isUsingPlaceholder,
+  ...droppableProps
+}: {
+  children: React.ReactElement[];
+  isUsingPlaceholder: boolean,
+  innerRef: DroppableProvided['innerRef'];
+}) => {
+  // https://github.com/inokawa/virtua/blob/0ff7834c4f7891a0f2fe9223b6ae6a2426f87505/stories/react/advanced/With%20react-beautiful-dnd.stories.tsx#L61-L77
+  useLayoutEffect(() => {
+    // Ignore ResizeObserver errors because ResizeObserver used in virtua can cause error on window
+    // (https://github.com/inokawa/virtua#what-is-resizeobserver-loop-completed-with-undelivered-notifications-error)
+    // and react-beautiful-dnd aborts dragging when it detects any errors on window.
+    // (https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/guides/setup-problem-detection-and-error-recovery.md#error-is-caught-by-window-error-listener)
+    //
+    // Set event listener here in this example because useLayoutEffect/componentDidMount will be called from children to parent usually.
+    const onError = (e: ErrorEvent) => {
+      if (e.message.includes('ResizeObserver')) {
+        e.stopImmediatePropagation();
+      }
+    };
+    window.addEventListener('error', onError);
+    return () => {
+      window.removeEventListener('error', onError);
+    };
+  }, []);
+
+  console.log('isUsingPlaceholder', isUsingPlaceholder);
+
+  return (
+    <Box
+      // ref={ref}
+      ref={innerRef}
+      // TODO: Use autosizer to get this height
+      style={{
+        overflowY: 'auto',
+        // width: '100%',
+        height: 600,
+      }}
+      {...droppableProps}
+    >
+      {/* <Virtualizer item={ItemWithMinHeight}>{children}</Virtualizer> */}
+      {/* <Virtualizer count={children.length}> */}
+      <Virtualizer count={isUsingPlaceholder ? children.length + 1 : children.length}>
+        {index => children[index]}
+      </Virtualizer>
+    </Box>
+  );
+});
+/* eslint-enable max-len */
 
 interface Props {
   list: MovieListFromServer,
@@ -153,6 +256,8 @@ const List: React.FC<Props> = ({
     setAddMoviesModalOpen(false);
   }
 
+  const [items, setItems] = useState(() => Array.from({ length: 1000 }, (_, i) => String(i + 1)));
+
   return (
     <>
       <AddMoviesToListModal
@@ -215,53 +320,114 @@ const List: React.FC<Props> = ({
               mr: -2,
               pr: 2,
               maxHeight: 'calc(max(60vh, 330px))',
-              overflow: 'auto',
+              // overflow: 'auto',
             }}
             in={expanded}
           >
             {workingMovieList && workingMovieList.length > 0 ? (
               <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId={`movie-list-${list.id}`}>
-                  {provided => {
+                <Droppable
+                  droppableId={`movie-list-${list.id}`}
+                  mode="virtual"
+                  renderClone={(provided, snapshot, rubric) => {
+                    const movie = workingMovieList[rubric.source.index];
+                    const fullMovie = moviesQuery.data.find(m => m.id === movie.id) || moviesQuery.data[0];
                     return (
-                      <Box
+                      <MovieCard
+                        provided={provided}
+                        altBackground
+                        movie={fullMovie}
+                        parentList={{
+                          list,
+                          onRemoveFromList: () => removeMovieFromList(movie.id),
+                        }}
+                      />
+                    );
+                    // return (
+                    //   <Item
+                    //     id={workingMovieList[rubric.source.index].id}
+                    //     isDragging={snapshot.isDragging}
+                    //     provided={provided}
+                    //   />
+                    // );
+                  }}
+                >
+                  {(provided, snapshot) => {
+                    return (
+                      <VirtualList
+                        innerRef={provided.innerRef}
+                        isUsingPlaceholder={snapshot.isUsingPlaceholder}
                         {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        display="flex"
-                        flexDirection="column"
-                        gap={1}
                       >
+                        {/* {items.map((id, i) => (
+                          <Draggable key={id} draggableId={id} index={i}>
+                            {provided => (
+                              <Item id={id} isDragging={false} provided={provided} />
+                            )}
+                          </Draggable>
+                        ))} */}
                         {workingMovieList.map((movie, index) => {
                           const fullMovie = moviesQuery.data.find(m => m.id === movie.id);
                           if (!fullMovie) {
                             return <MovieSkeleton key={movie.id} altBackground />;
                           }
                           return (
-                            <Draggable
-                              key={movie.id}
-                              draggableId={movie.id}
-                              index={index}
-                              isDragDisabled={disabled}
-                            >
-                              {(provided, snapshot) => {
-                                return (
-                                  <MovieCard
-                                    provided={provided}
-                                    altBackground
-                                    movie={fullMovie}
-                                    parentList={{
-                                      list,
-                                      onRemoveFromList: () => removeMovieFromList(movie.id),
-                                    }}
-                                  />
-                                );
-                              }}
+                            <Draggable key={movie.id} draggableId={movie.id} index={index} isDragDisabled={disabled}>
+                              {(provided, snapshot) => (
+                                <MovieCard
+                                  provided={provided}
+                                  altBackground
+                                  movie={fullMovie}
+                                  parentList={{
+                                    list,
+                                    onRemoveFromList: () => removeMovieFromList(movie.id),
+                                  }}
+                                />
+                              )}
                             </Draggable>
                           );
                         })}
-                        {provided.placeholder}
-                      </Box>
+                      </VirtualList>
                     );
+                    // return (
+                    //   <Box
+                    //     {...provided.droppableProps}
+                    //     ref={provided.innerRef}
+                    //     display="flex"
+                    //     flexDirection="column"
+                    //     gap={1}
+                    //   >
+                    //     {workingMovieList.map((movie, index) => {
+                    //       const fullMovie = moviesQuery.data.find(m => m.id === movie.id);
+                    //       if (!fullMovie) {
+                    //         return <MovieSkeleton key={movie.id} altBackground />;
+                    //       }
+                    //       return (
+                    //         <Draggable
+                    //           key={movie.id}
+                    //           draggableId={movie.id}
+                    //           index={index}
+                    //           isDragDisabled={disabled}
+                    //         >
+                    //           {(provided, snapshot) => {
+                    //             return (
+                    //               <MovieCard
+                    //                 provided={provided}
+                    //                 altBackground
+                    //                 movie={fullMovie}
+                    //                 parentList={{
+                    //                   list,
+                    //                   onRemoveFromList: () => removeMovieFromList(movie.id),
+                    //                 }}
+                    //               />
+                    //             );
+                    //           }}
+                    //         </Draggable>
+                    //       );
+                    //     })}
+                    //     {provided.placeholder}
+                    //   </Box>
+                    // );
                   }}
                 </Droppable>
               </DragDropContext>

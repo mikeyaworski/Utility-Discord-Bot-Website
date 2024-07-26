@@ -10,6 +10,7 @@ import List from './List';
 import ListSkeleton from './ListSkeleton';
 import CreateListModal from './CreateListModal';
 import { useFetchLists } from './utils';
+import VirtualizedList from './VirtualizedList';
 
 const MovieLists: React.FC = () => {
   const { user } = useContext(AuthContext);
@@ -24,6 +25,10 @@ const MovieLists: React.FC = () => {
         onClose={() => setCreateListModalOpen(false)}
         onConfirm={() => setCreateListModalOpen(false)}
       />
+      <Box>
+        <Box>This is a test</Box>
+        <VirtualizedList />
+      </Box>
       <Box display="flex" flexWrap="wrap" mb={2} gap={2}>
         {listsQuery.data.map(list => (
           <Suspense key={list.id} fallback={<ListSkeleton name={list.name} id={list.custom_id || list.id} />}>
