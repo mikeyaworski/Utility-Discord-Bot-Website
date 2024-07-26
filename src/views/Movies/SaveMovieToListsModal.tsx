@@ -70,6 +70,7 @@ const SaveMovieToListsModal: React.FC<Props> = ({
       setIsCreatingNewList(false);
       setCreateListName('');
       setCreateListCustomId('');
+      addToList(newList.id);
       alert.success('List created');
     },
     onError: err => {
