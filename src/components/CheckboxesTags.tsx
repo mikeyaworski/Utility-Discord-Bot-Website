@@ -22,6 +22,7 @@ const CheckboxesTags: React.FC<Props> = ({ options, value, setValue, inputProps 
       autoHighlight
       options={options}
       disableCloseOnSelect
+      disableClearable
       getOptionLabel={option => option.label}
       ListboxComponent={VirtualizedListbox}
       renderOption={(props, option, state) => (
