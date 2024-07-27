@@ -37,7 +37,7 @@ const NoteModal: React.FC<Props> = ({
       if (input) {
         const newNote = await fetchApi<MovieNote>({
           method: 'PUT',
-          path: `/movies/${selectedGuildId}/${movie.imdb_id}/notes`,
+          path: `/movies/${selectedGuildId}/${movie.id}/notes`,
           body: JSON.stringify({
             note: input,
           }),
@@ -57,7 +57,7 @@ const NoteModal: React.FC<Props> = ({
       }
       await fetchApi({
         method: 'DELETE',
-        path: `/movies/${selectedGuildId}/${movie.imdb_id}/notes`,
+        path: `/movies/${selectedGuildId}/${movie.id}/notes`,
       });
       // Optimistically update the state
       // queryClient.setQueryData<Movie[]>(

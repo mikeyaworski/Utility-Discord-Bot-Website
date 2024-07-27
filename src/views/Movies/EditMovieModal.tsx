@@ -83,7 +83,7 @@ const EditMovieModal: React.FC<Props> = ({
     mutationFn: () => {
       return fetchApi<Movie>({
         method: 'PATCH',
-        path: `/movies/${selectedGuildId}/${movie.imdb_id}`,
+        path: `/movies/${selectedGuildId}/${movie.id}`,
         body: JSON.stringify(input),
       });
     },

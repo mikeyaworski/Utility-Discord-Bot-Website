@@ -122,7 +122,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
     mutationFn: async () => {
       await fetchApi({
         method: 'DELETE',
-        path: `/movies/${selectedGuildId}/${movie.imdb_id}`,
+        path: `/movies/${selectedGuildId}/${movie.id}`,
       });
     },
     onSuccess: () => {

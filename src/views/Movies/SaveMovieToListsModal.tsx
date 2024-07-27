@@ -83,7 +83,7 @@ const SaveMovieToListsModal: React.FC<Props> = ({
       const newListIds = Array.from(listsSet);
       await fetchApi<Movie>({
         method: 'PUT',
-        path: `/movies/${selectedGuildId}/${movie.imdb_id}/lists`,
+        path: `/movies/${selectedGuildId}/${movie.id}/lists`,
         body: JSON.stringify(newListIds),
       });
       return newListIds;
