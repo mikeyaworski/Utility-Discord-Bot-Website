@@ -51,6 +51,7 @@ const CreateListModal: React.FC<BaseModalProps> = ({
       confirmText="Create"
       canConfirm={Boolean(name)}
       busy={mutation.isPending}
+      allowFormSubmission
     >
       <Typography variant="h5" sx={{ mb: 2 }}>Create List</Typography>
       <Box display="flex" flexDirection="column" gap={2}>
