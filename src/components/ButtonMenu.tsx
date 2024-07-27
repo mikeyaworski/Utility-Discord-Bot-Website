@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, MenuItem, IconButton } from '@mui/material';
+import { Menu, MenuItem, IconButton, Divider } from '@mui/material';
 import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
 
 interface MenuItem {
@@ -9,10 +9,14 @@ interface MenuItem {
   onClick: () => void,
 }
 
+interface DividerItem {
+  divider: true,
+}
+
 interface Props {
   icon?: typeof MoreHorizIcon,
   iconSize?: number,
-  items: MenuItem[],
+  items: (MenuItem | DividerItem)[],
   disabled?: boolean,
 }
 
@@ -65,11 +69,13 @@ const ButtonMenu: React.FC<Props> = ({ icon: Icon = MoreHorizIcon, iconSize = 20
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {items.map(({ label, onClick, icon: Icon, iconColor }) => (
-          <MenuItem key={label} onClick={onClick}>
-            {Icon && <Icon fontSize="small" color={iconColor} sx={{ mr: 1.5 }} />} {label}
+        {items.map(item => ('divider' in item ? (
+          <Divider />
+        ) : (
+          <MenuItem key={item.label} onClick={item.onClick}>
+            {item.icon && <item.icon fontSize="small" color={item.iconColor} sx={{ mr: 1.5 }} />} {item.label}
           </MenuItem>
-        ))}
+        )))}
       </Menu>
     </>
   );

@@ -1,6 +1,7 @@
 import type { Movie, MovieListMinimal } from 'types';
 
 import React, { CSSProperties, useContext, useState } from 'react';
+import copy from 'copy-to-clipboard';
 import { DraggableProvided } from 'react-beautiful-dnd';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -27,6 +28,8 @@ import {
   ExpandLess as ExpandLessIcon,
   ChatBubble as ChatBubbleIcon,
   Add as AddIcon,
+  ContentCopy as CopyIcon,
+  PlayCircleFilledWhite as StartIcon,
 } from '@mui/icons-material';
 import { alertError, fetchApi, filterOutFalsy, humanizeDuration } from 'utils';
 import { useConfirmationModal, useGetMemberName } from 'hooks';
@@ -117,6 +120,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
     confirmText: 'Delete Movie',
     confirmColor: 'error',
   });
+  const { node: startMovieModal, open: openStartMovieModal } = useConfirmationModal({
+    confirmText: 'Start',
+    confirmColor: 'primary',
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -129,6 +136,22 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
       alert.success('Movie was deleted');
       // A movie cannot be deleted while it is in a list, so no need to remove it from movie-lists query data
       queryClient.setQueryData<Movie[]>(['movies', selectedGuildId], old => old?.filter(m => m.id !== movie.id));
+    },
+    onError: err => {
+      alertError(err);
+    },
+  });
+
+  const startMovieMutation = useMutation({
+    mutationFn: async () => {
+      await fetchApi({
+        method: 'POST',
+        path: `/movies/${selectedGuildId}/${movie.id}/start`,
+      });
+    },
+    onSuccess: () => {
+      alert.success('Movie started');
+      queryClient.setQueryData<Movie[]>(['movies', selectedGuildId], old => old?.map(m => (m.id === movie.id ? { ...movie, was_watched: true } : m)));
     },
     onError: err => {
       alertError(err);
@@ -152,6 +175,7 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
         movie={movie}
       />
       {!parentList && confirmDeleteMovieModal}
+      {startMovieModal}
       <EditMovieModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
@@ -217,6 +241,30 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie, parentList, altBackground,
                   onClick: () => {
                     parentList.onRemoveFromList();
                   },
+                },
+                {
+                  divider: true,
+                },
+                movie.imdb_id && {
+                  icon: CopyIcon,
+                  label: 'Copy IMDb ID',
+                  onClick: () => {
+                    if (movie.imdb_id) {
+                      copy(movie.imdb_id);
+                      alert.success('Copied to clipboard');
+                    }
+                  },
+                },
+                {
+                  icon: StartIcon,
+                  label: 'Start Movie',
+                  onClick: () => openStartMovieModal({
+                    title: `Start "${movie.title}"?`,
+                    details: 'This will create a thread and ping the role configured to receive movie notifications.',
+                    onConfirm: async () => {
+                      await startMovieMutation.mutateAsync();
+                    },
+                  }),
                 },
               ])}
               />
