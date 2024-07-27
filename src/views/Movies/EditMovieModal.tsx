@@ -122,7 +122,7 @@ const EditMovieModal: React.FC<Props> = ({
     <BaseModal
       {...baseModalProps}
       onConfirm={() => mutation.mutate()}
-      confirmText="Create"
+      confirmText="Save"
       canConfirm={Boolean(input.title)}
       busy={mutation.isPending}
     >
