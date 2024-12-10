@@ -30,7 +30,7 @@ const MoviesSkeleton: React.FC = () => {
         </Box>
       </Box>
       <Fab
-        title="Create New List"
+        title="Create New Movie"
         color="primary"
         sx={{
           position: 'fixed',
