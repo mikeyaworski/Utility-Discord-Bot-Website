@@ -103,6 +103,7 @@ const MentionableInput: React.FC<Props> = ({
           padding: '19.5px 14px 15.5px 14px',
         },
         '& textarea': {
+          border: '1px solid rgba(255, 255, 255, 0.23)',
           padding: '19.5px 14px 15.5px 14px',
           borderRadius: '4px',
           color: '#FFFFFF',
@@ -110,8 +111,7 @@ const MentionableInput: React.FC<Props> = ({
             borderColor: '#FFFFFF',
           },
           '&:focus': {
-            borderColor: theme.palette.primary.main,
-            borderWidth: 2,
+            border: `2px solid ${theme.palette.primary.main}`,
             outline: 'unset',
             outlineOffset: 'unset',
             padding: '18.5px 13px 15.5px 13px',
