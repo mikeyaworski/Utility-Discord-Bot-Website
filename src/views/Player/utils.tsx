@@ -21,7 +21,7 @@ export function useTryUpdate({
   setPlayerStatus: SetState<PlayerStatusData | null>,
   setBusy: SetState<boolean>,
 }): (fn: () => Promise<void>) => void {
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
   return async function tryUpdate(fn: () => Promise<void>) {
     if (!playerStatus) return;
     setBusy(true);
@@ -34,7 +34,7 @@ export function useTryUpdate({
       setPlayerStatus(playerStatusBeforeUpdate);
       // @ts-ignore
       const body = await err.text();
-      alert.actions.error(body);
+      alert.error(body);
     }
   };
 }

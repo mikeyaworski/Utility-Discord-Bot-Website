@@ -11,8 +11,7 @@ import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-qu
 import theme from 'theme';
 import { useOauthState, useQueryParam } from 'hooks';
 import { error as logError } from 'logging';
-import { alertError } from 'utils';
-import { AlertProvider } from 'alerts';
+import { AlertProvider, alertError } from 'alerts';
 import ErrorBoundaryFallback from 'views/ErrorBoundaryFallback';
 import { AuthProvider } from 'contexts/auth';
 import { GuildProvider } from 'contexts/guild';

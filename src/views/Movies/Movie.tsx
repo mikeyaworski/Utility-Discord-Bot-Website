@@ -31,9 +31,9 @@ import {
   ContentCopy as CopyIcon,
   PlayCircleFilledWhite as StartIcon,
 } from '@mui/icons-material';
-import { alertError, fetchApi, filterOutFalsy, humanizeDuration } from 'utils';
+import { fetchApi, filterOutFalsy, humanizeDuration } from 'utils';
 import { useConfirmationModal, useGetMemberName } from 'hooks';
-import { useAlert } from 'alerts';
+import { useAlert, alertError } from 'alerts';
 import { error } from 'logging';
 import ButtonMenu from 'components/ButtonMenu';
 import Mention from 'components/Mention';

@@ -64,7 +64,7 @@ function getTurnInfo(userId: string, game: ChessGame) {
 
 const ChessView: React.FC = () => {
   const { user, hasFetched } = useContext(AuthContext);
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
   const isMobile = useIsMobile();
 
   // TODO: Support board color and piece preferences
@@ -165,13 +165,13 @@ const ChessView: React.FC = () => {
     });
     socket?.on(SocketEventTypes.CHESS_CHALLENGE_DECLINED, ({ id }: ChessGameIdData) => {
       setGames(old => old.filter(g => g.model.id !== id));
-      alert.actions.error(`Game declined: ${id}`);
+      alert.error(`Game declined: ${id}`);
     });
     socket?.on(SocketEventTypes.CHESS_GAME_RESIGNED, ({ id, resigner }: ChessGameForfeitData) => {
       if (user?.id === resigner) {
-        alert.actions.success(`Game resigned: ${id}`);
+        alert.success(`Game resigned: ${id}`);
       } else {
-        alert.actions.success(`You've won game ${id} by resignation!`);
+        alert.success(`You've won game ${id} by resignation!`);
       }
       addForfeitedGame(id);
     });
@@ -198,7 +198,7 @@ const ChessView: React.FC = () => {
       await handleGameUpdate(res);
       setSelectedGameId(gameId);
     } catch (err) {
-      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
     }
     setBusy(false);
   }
@@ -209,7 +209,7 @@ const ChessView: React.FC = () => {
       method: 'POST',
       path: `/chess/${gameId}/decline`,
     }).catch(err => {
-      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
     });
     setGames(old => old.filter(g => g.model.id !== gameId));
     setBusy(false);
@@ -226,7 +226,7 @@ const ChessView: React.FC = () => {
       });
       await handleGameUpdate(res);
     } catch (err) {
-      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
     }
     setBusy(false);
   }
@@ -237,7 +237,7 @@ const ChessView: React.FC = () => {
       method: 'POST',
       path: `/chess/${gameId}/resign`,
     }).catch(err => {
-      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
     });
     addForfeitedGame(gameId);
     setBusy(false);
@@ -352,7 +352,7 @@ const ChessView: React.FC = () => {
             setGames(old => old.concat(res));
             setChallengeModalOpen(false);
           } catch (err) {
-            alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+            alert.error(`Something went wrong: ${get(err, 'status')}`);
           }
           setBusy(false);
         }}

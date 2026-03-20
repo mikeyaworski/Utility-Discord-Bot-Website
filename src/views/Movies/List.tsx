@@ -20,8 +20,8 @@ import {
   Save as SaveIcon,
   Add as AddIcon,
 } from '@mui/icons-material';
-import { fetchApi, reorder, alertError } from 'utils';
-import { useAlert } from 'alerts';
+import { fetchApi, reorder } from 'utils';
+import { useAlert, alertError } from 'alerts';
 import { GuildContext } from 'contexts/guild';
 import { useConfirmationModal } from 'hooks';
 import ButtonMenu from 'components/ButtonMenu';

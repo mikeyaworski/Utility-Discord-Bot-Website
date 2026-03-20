@@ -13,7 +13,7 @@ const conversationStateKey = 'chatGptConversation';
 const conversationStorageLimit = 100;
 
 const ChatGpt: React.FC = () => {
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
   const [conversation, setConversation] = useState<ChatGptConversationMessage[]>(() => JSON.parse(
     window.localStorage.getItem(conversationStateKey) || '[]',
   ));
@@ -51,7 +51,7 @@ const ChatGpt: React.FC = () => {
       setConversation(old => [{ role: 'assistant', content: chatGptResponse }, ...old]);
     } catch (err) {
       const errMsg = await getErrorMsg(err);
-      alert.actions.error(`${get(err, 'status')}: ${errMsg}`);
+      alert.error(`${get(err, 'status')}: ${errMsg}`);
       setInput(message);
       setConversation(old => old.slice(1));
     }

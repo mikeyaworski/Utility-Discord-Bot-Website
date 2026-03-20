@@ -8,9 +8,9 @@ import {
 } from '@mui/icons-material';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { IdObject, Movie, MovieListFromServer, Option } from 'types';
-import { alertError, fetchApi } from 'utils';
+import { fetchApi } from 'utils';
 import { usePartialStateReset } from 'hooks';
-import { useAlert } from 'alerts';
+import { useAlert, alertError } from 'alerts';
 import { GuildContext } from 'contexts/guild';
 import CheckboxesTags from 'components/CheckboxesTags';
 import { isImdbId, useFetchMovies } from './utils';

@@ -26,7 +26,7 @@ interface Props {
 
 const PlayForm: React.FC<Props> = ({ playerStatus }) => {
   const { selectedGuildId } = useContext(GuildContext);
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
 
   const [selectedTab, setSelectedTab] = React.useState(0);
   const [input, setInput] = useState('');
@@ -99,10 +99,10 @@ const PlayForm: React.FC<Props> = ({ playerStatus }) => {
         });
         setSubmitting(false);
         resetInputs();
-        alert.actions.success(playerStatus?.currentTrack ? 'Success! Track(s) are being queued.' : 'Success! Track will play momentarily.');
+        alert.success(playerStatus?.currentTrack ? 'Success! Track(s) are being queued.' : 'Success! Track will play momentarily.');
       } catch (err) {
         setSubmitting(false);
-        alert.actions.error(await getErrorMsg(err));
+        alert.error(await getErrorMsg(err));
       }
     }
   }

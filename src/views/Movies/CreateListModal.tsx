@@ -4,8 +4,8 @@ import { Box, TextField, Typography } from '@mui/material';
 import { GuildContext } from 'contexts/guild';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { MovieListFromServer } from 'types';
-import { alertError, fetchApi } from 'utils';
-import { useAlert } from 'alerts';
+import { fetchApi } from 'utils';
+import { useAlert, alertError } from 'alerts';
 
 const CreateListModal: React.FC<BaseModalProps> = ({
   onConfirm,

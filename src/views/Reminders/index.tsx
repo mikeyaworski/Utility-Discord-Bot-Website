@@ -31,7 +31,7 @@ enum Sort {
 }
 
 const Reminders: React.FC = () => {
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
   const { user } = useContext(AuthContext);
   const { selectedGuildId } = useContext(GuildContext);
   const [sort, setSort] = useState<Sort>(() => {
@@ -71,7 +71,7 @@ const Reminders: React.FC = () => {
       setLoading(false);
     }).catch(err => {
       error(err);
-      alert.actions.error('Failed to fetch reminders');
+      alert.error('Failed to fetch reminders');
     });
   }, [user, selectedGuildId, alert]);
 
@@ -90,10 +90,10 @@ const Reminders: React.FC = () => {
       setReminders(old => old.concat(newReminders));
       setCreateModalBusy(false);
       setCreateModalOpen(false);
-      alert.actions.success(newReminders.length > 1 ? `${newReminders.length} reminders created!` : 'Reminder created!');
+      alert.success(newReminders.length > 1 ? `${newReminders.length} reminders created!` : 'Reminder created!');
     } catch (err) {
       setCreateModalBusy(false);
-      alert.actions.error(`Something went wrong: ${get(err, 'status')}`);
+      alert.error(`Something went wrong: ${get(err, 'status')}`);
     }
   }, [alert]);
 
@@ -109,15 +109,15 @@ const Reminders: React.FC = () => {
         path: `/reminders/${reminder.model.id}`,
       });
       setReminders(old => old.map(oldReminder => (oldReminder.model.id === reminder.model.id ? updatedReminder : oldReminder)));
-      alert.actions.success('Reminder updated');
+      alert.success('Reminder updated');
     } catch (err) {
-      alert.actions.error('Reminder was updated, but could not be refetched. Try refreshing your page.');
+      alert.error('Reminder was updated, but could not be refetched. Try refreshing your page.');
     }
   }, [alert]);
 
   const onReminderDeleted = useCallback((id: string) => {
     setReminders(old => old.filter(reminder => reminder.model.id !== id));
-    alert.actions.success('Reminder deleted');
+    alert.success('Reminder deleted');
   }, [alert]);
 
   // Reverse before removing duplicates since we assume the last duplicate

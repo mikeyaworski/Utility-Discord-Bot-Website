@@ -1,7 +1,9 @@
+import type { IntentionalAny } from 'types';
+
 import React, { useCallback } from 'react';
 import { create } from 'zustand';
 import { Snackbar, Alert, SnackbarCloseReason } from '@mui/material';
-import { IntentionalAny } from 'types';
+import { getErrorMsg } from 'utils';
 
 type AlertFn = (message: string) => void;
 
@@ -85,3 +87,20 @@ export const AlertProvider: React.FC<Props> = ({ children }) => {
     </>
   );
 };
+
+export async function alert(message: string, type: AlertType): Promise<void> {
+  // Zustand allows for use outside of a React component.
+  // And although it's not necessary since we can just use the hook as a hook,
+  // this is very convenient and removes boilerplate.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useAlert.setState({
+    open: true,
+    type,
+    message,
+  });
+}
+
+export async function alertError(err: unknown): Promise<void> {
+  const message = await getErrorMsg(err);
+  alert(message, AlertType.ERROR);
+}

@@ -302,15 +302,3 @@ export function reorder<T = unknown[]>(list: T[], startIndex: number, endIndex: 
   result.splice(endIndex, 0, removed);
   return result;
 }
-
-export async function alertError(err: unknown): Promise<void> {
-  // Zustand allows for use outside of a React component.
-  // And although it's not necessary since we can just use the hook as a hook,
-  // this is very convenient and removes boilerplate.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useAlert.setState({
-    open: true,
-    type: AlertType.ERROR,
-    message: await getErrorMsg(err),
-  });
-}

@@ -17,7 +17,7 @@ interface Props {
 }
 
 const Navigation: React.FC<Props> = ({ children }) => {
-  const alert = useAlert();
+  const alert = useAlert(store => store.actions);
   const theme = useTheme();
   const navigate = useNavigate();
   const { validate: validateOauthState, remove: removeOauthState } = useOauthState();
@@ -47,11 +47,11 @@ const Navigation: React.FC<Props> = ({ children }) => {
         if (user) await refetchBotDm();
       } catch (err) {
         error('Error:', err);
-        alert.actions.error('Could not log in');
+        alert.error('Could not log in');
       }
     }
     if (validateOauthState(oauthState)) logIn();
-    else alert.actions.error('Invalid OAuth State');
+    else alert.error('Invalid OAuth State');
   }, [
     code,
     state,

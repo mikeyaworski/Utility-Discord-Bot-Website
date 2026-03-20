@@ -6,8 +6,8 @@ import {
   Add as AddIcon,
   Remove as RemoveIcon,
 } from '@mui/icons-material';
-import { alertError, fetchApi } from 'utils';
-import { useAlert } from 'alerts';
+import { fetchApi } from 'utils';
+import { useAlert, alertError } from 'alerts';
 import { usePartialStateReset, useSet } from 'hooks';
 import { error } from 'logging';
 import { GuildContext } from 'contexts/guild';
