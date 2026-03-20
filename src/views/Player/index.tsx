@@ -53,9 +53,6 @@ const Player: React.FC = () => {
     socket?.on(SocketEventTypes.PLAYER_DISCONNECTED, ({ guildId }: PlayerDisconnectedData) => {
       if (guildId === selectedGuildId) setPlayerStatus(null);
     });
-    return () => {
-      socket?.removeAllListeners();
-    };
   }, [socket, selectedGuildId]);
 
   async function clearQueue() {

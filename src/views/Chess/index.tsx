@@ -175,9 +175,6 @@ const ChessView: React.FC = () => {
       }
       addForfeitedGame(id);
     });
-    return () => {
-      socket?.removeAllListeners();
-    };
   }, [socket, handleGameUpdate, alert, user, addForfeitedGame]);
 
   function updateGameState(game: Chess) {
