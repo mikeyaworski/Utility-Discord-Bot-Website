@@ -99,6 +99,14 @@ const ModalInputs: React.FC<Props> = ({
               options={[]}
               freeSolo
               autoSelect
+              sx={{
+                // Prevent the input from shrinking/growing during hover/focus changes.
+                // This can cause the input to repeatedly change height.
+                // The input should always be on its own line, so there is no layout shifting.
+                '& .MuiAutocomplete-input': {
+                  minWidth: '100% !important',
+                },
+              }}
               renderInput={params => (
                 <TextField
                   {...params}
