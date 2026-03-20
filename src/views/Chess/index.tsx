@@ -20,6 +20,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   TextField,
   Typography,
 } from '@mui/material';
@@ -429,26 +430,24 @@ const ChessView: React.FC = () => {
           <CardHeader title={<Typography variant="h6">Actions</Typography>} />
           <CardContent sx={{ pt: 0 }}>
             <List disablePadding>
-              <ListItem
-                button
+              <ListItemButton
                 onClick={() => setChallengeModalOpen(true)}
                 disabled={!hasFetched}
                 sx={actionItemStyle}
               >
                 <FontAwesomeIcon icon={faChessKing} width={24} height={24} />
                 <Typography variant="body1">Create Challenge</Typography>
-              </ListItem>
+              </ListItemButton>
               {selectedGame && actions.map(action => (
-                <ListItem
+                <ListItemButton
                   key={action.label}
-                  button
                   onClick={() => action.fn(selectedGame.model.id)}
                   disabled={action.disabled || busy || resignedGames.has(selectedGame.model.id)}
                   sx={actionItemStyle}
                 >
                   <action.icon sx={{ width: 24, height: 24 }} />
                   <Typography variant="body1">{action.label}</Typography>
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </CardContent>
