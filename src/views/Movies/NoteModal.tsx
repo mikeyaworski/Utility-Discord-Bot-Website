@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TextField, Typography } from '@mui/material';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { Movie, MovieNote } from 'types';
 import { alertError, fetchApi } from 'utils';
 import { useAlert } from 'alerts';
+import { usePartialStateReset } from 'hooks';
 import { GuildContext } from 'contexts/guild';
 import { useMyMovieNote } from './utils';
 
@@ -27,7 +28,7 @@ const NoteModal: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const existingNote = useMyMovieNote(movie);
   const [input, setInput] = useState(existingNote?.note || '');
-  useEffect(() => {
+  usePartialStateReset(() => {
     setInput(existingNote?.note || '');
   }, [existingNote, baseModalProps.open]);
   const isDeleting = existingNote && input === '';

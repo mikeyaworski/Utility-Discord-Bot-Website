@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import uniqBy from 'lodash.uniqby';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Box, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
@@ -8,6 +8,7 @@ import BaseModal, { BaseModalProps } from 'modals/Base';
 import { Movie } from 'types';
 import { alertError, fetchApi } from 'utils';
 import { useAlert } from 'alerts';
+import { usePartialStateReset } from 'hooks';
 
 type MoviePatchFields = Pick<Movie,
 'title'
@@ -77,7 +78,7 @@ const EditMovieModal: React.FC<Props> = ({
   }), [movie]);
 
   const [input, setInput] = useState<MoviePatchFields>(() => getMovieInput());
-  useEffect(() => setInput(getMovieInput()), [getMovieInput, baseModalProps.open]);
+  usePartialStateReset(() => setInput(getMovieInput()), [getMovieInput, baseModalProps.open]);
 
   const mutation = useMutation({
     mutationFn: () => {

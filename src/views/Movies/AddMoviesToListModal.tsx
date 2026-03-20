@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import uniqBy from 'lodash.uniqby';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, CardActions, CardContent, Collapse, TextField, Typography } from '@mui/material';
@@ -9,6 +9,7 @@ import {
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { IdObject, Movie, MovieListFromServer, Option } from 'types';
 import { alertError, fetchApi } from 'utils';
+import { usePartialStateReset } from 'hooks';
 import { useAlert } from 'alerts';
 import { GuildContext } from 'contexts/guild';
 import CheckboxesTags from 'components/CheckboxesTags';
@@ -34,7 +35,7 @@ const AddMoviesToListModal: React.FC<Props> = ({
 
   const moviesQuery = useFetchMovies();
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     setNewMovies([]);
     setCreateMovieInput('');
     setIsCreatingNewMovie(false);

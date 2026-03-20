@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { ReminderModel } from 'types';
 import { Box, Typography } from '@mui/material';
-import { useGuildState } from 'hooks';
+import { useGuildState, usePartialStateReset } from 'hooks';
 import GuildSelector from 'components/GuildSelector';
 import { AuthContext } from 'contexts/auth';
 import { convertReactMentionsToDiscordMentions } from 'utils';
@@ -40,7 +40,7 @@ const CreateReminderModal: React.FC<Props> = ({
     return null;
   });
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     if (!guildId && botDmChannelId) setChannelId(botDmChannelId);
     else setChannelId(null);
   }, [guildId, botDmChannelId]);

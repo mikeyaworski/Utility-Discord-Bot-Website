@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { ReminderModel } from 'types';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField, Typography } from '@mui/material';
 import ChannelInput from 'components/ChannelInput';
 import GuildSelector from 'components/GuildSelector';
 import MemberInput from 'components/MemberInput';
-import { useGuildState } from 'hooks';
+import { useGuildState, usePartialStateReset } from 'hooks';
 
 export type Payload = Omit<ReminderModel, 'id' | 'guild_id' | 'owner_id' | 'createdAt' | 'updatedAt'> & {
   message: string | null,
@@ -43,7 +43,7 @@ const ChallengeModal: React.FC<Props> = ({
   const [myColor, setMyColor] = useState<Color | null>(Color.RANDOM);
   const [channelId, setChannelId] = useState<string | null>(null);
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     setChannelId(null);
     setChallengedUserId(null);
   }, [guildId]);

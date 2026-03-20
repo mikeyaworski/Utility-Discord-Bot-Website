@@ -31,7 +31,7 @@ import ResizableBox from 'components/ResizableBox';
 import { ChessGame, Option } from 'types';
 import { fetchApi } from 'utils';
 import { AuthContext } from 'contexts/auth';
-import { useConfirmationModal, useIsMobile, useSet, useSocket } from 'hooks';
+import { useConfirmationModal, useIsMobile, usePartialStateReset, useSet, useSocket } from 'hooks';
 import { ChessGameForfeitData, ChessGameIdData, SocketEventTypes } from 'types/sockets';
 import { useAlert } from 'alerts';
 import ChallengeModal from './ChallengeModal';
@@ -114,7 +114,7 @@ const ChessView: React.FC = () => {
     });
   }, []);
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     if (playableGames.length > 0 && !selectedGameId) {
       setSelectedGameId(playableGames[0].model.id);
     }

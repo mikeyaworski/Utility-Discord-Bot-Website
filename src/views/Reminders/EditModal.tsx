@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import BaseModal, { BaseModalProps } from 'modals/Base';
 import { Reminder } from 'types';
 import { Typography } from '@mui/material';
-import { useConvertDiscordMentionsToReactMentions } from 'hooks';
+import { useConvertDiscordMentionsToReactMentions, usePartialStateReset } from 'hooks';
 import { convertReactMentionsToDiscordMentions } from 'utils';
 import ModalInputs from './ModalInputs';
 import type { Payload } from './CreateModal';
@@ -27,7 +27,7 @@ const EditReminderModal: React.FC<Props> = ({
   const [maxOccurrences, setMaxOccurrences] = useState<number | null>(reminder.model.max_occurrences);
   const [channelId, setChannelId] = useState<string>(reminder.model.channel_id);
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     setMessage(convertDiscordMentionsToReactMentions(reminder.model.message || '') || '');
     setTimes([reminder.model.time]);
     setInterval(reminder.model.interval);

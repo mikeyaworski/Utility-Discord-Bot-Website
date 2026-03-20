@@ -1,11 +1,12 @@
 import type { SetState } from 'types';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Box, Button, Checkbox, Chip, FormControlLabel, IconButton, MenuItem, Popover, TextField } from '@mui/material';
 import {
   FilterList as FilterListIcon,
 } from '@mui/icons-material';
 import SearchInput from 'components/SearchInput';
+import { usePartialStateReset } from 'hooks';
 
 export enum Sort {
   NO_SORT,
@@ -128,7 +129,7 @@ const MovieFilters: React.FC<Props> = ({ filters, setFilters, disabled = false }
 
   const filterFieldType = FIELD_DATA.find(field => field.id === filterFieldKey)!.type;
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     switch (filterFieldType) {
       case 'number': {
         setFilterFieldValue(0);

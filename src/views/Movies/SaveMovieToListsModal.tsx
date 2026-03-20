@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSetAtom } from 'jotai';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, CardActions, CardContent, Checkbox, Collapse, FormControlLabel, Paper, TextField, Typography } from '@mui/material';
@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import { alertError, fetchApi } from 'utils';
 import { useAlert } from 'alerts';
-import { useSet } from 'hooks';
+import { usePartialStateReset, useSet } from 'hooks';
 import { error } from 'logging';
 import { GuildContext } from 'contexts/guild';
 import { Movie, MovieListFromServer } from 'types';
@@ -44,7 +44,7 @@ const SaveMovieToListsModal: React.FC<Props> = ({
     setData: setListsSet,
   } = useSet(movie.lists.map(list => list.id));
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     setListsSet(new Set(movie.lists.map(list => list.id)));
     setCreateListName('');
     setCreateListCustomId('');

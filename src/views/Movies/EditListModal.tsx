@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Box, TextField, Typography } from '@mui/material';
 import BaseModal, { BaseModalProps } from 'modals/Base';
@@ -22,11 +22,6 @@ const EditListModal: React.FC<Props> = ({
 
   const [name, setName] = useState<string>(list.name);
   const [customId, setCustomId] = useState<string>(list.custom_id || '');
-
-  useEffect(() => {
-    setName(list.name);
-    setCustomId(list.custom_id || '');
-  }, [list]);
 
   const mutation = useMutation({
     mutationFn: () => {

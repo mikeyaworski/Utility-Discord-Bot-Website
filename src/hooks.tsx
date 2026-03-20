@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { Box, Menu, MenuItem, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -8,6 +8,25 @@ import type { Guild, Channel, Member, Role, SetState } from 'types';
 import { convertDiscordMentionsToReactMentions, fetchApi, getChannelLabel, parseDiscordMentions } from 'utils';
 import ConfirmModal from 'modals/Confirm';
 import { BaseModalProps } from 'modals/Base';
+
+/**
+ * Hook used to avoid useEffect anti-pattern of adjusting state when props change.
+ * The callback function is invoked outside of an effect and only when the dependencies (which should be props) change.
+ * This is a drop-in replacement (same function signature) for useEffect,
+ * except that the callback is invoked during render to avoid a stale state being rendered.
+ */
+export function usePartialStateReset(cb: () => void, deps: unknown[]): void {
+  const prevDeps = useRef<null | unknown[]>(null);
+
+  const depsChanged = !prevDeps.current
+    || prevDeps.current.length !== deps.length
+    || prevDeps.current.some((dep, i) => dep !== deps[i]);
+
+  if (depsChanged) {
+    prevDeps.current = deps;
+    cb();
+  }
+}
 
 export function useGetGuild(): (guildId: string | null | undefined) => Guild | null | undefined {
   const { user } = useContext(AuthContext);
@@ -134,7 +153,7 @@ export function useGuildState({
     channels,
   } = useGuildData(shouldFetchGuildData ? id : null);
 
-  useEffect(() => {
+  usePartialStateReset(() => {
     setId(globalGuildId);
   }, [globalGuildId]);
 
